@@ -1,0 +1,269 @@
+{# La pagina de resultado: menu semanal, lista de la compra e informe. #}
+{% extends "base.html" %}
+
+{% block titulo %}Tu menú de {{ plan.semanas }} semana(s){% endblock %}
+
+{% block contenido %}
+
+{# --- RESUMEN DE ARRIBA ---------------------------------------------------- #}
+<section class="resumen">
+  <div class="resumen-cabecera">
+    <h1>Tu plan de {{ plan.semanas }} semana{{ 's' if plan.semanas > 1 }}</h1>
+    <p class="subtitulo">
+      {{ nombres_dietas[plan.dieta] }} ·
+      {{ plan.personas }} persona{{ 's' if plan.personas > 1 }} ·
+      {{ plan.comidas_totales }} comidas
+      {%- if plan.con_desayunos %} · desayunos incluidos{% endif %}
+    </p>
+  </div>
+
+  {# La barra de presupuesto. La clase cambia si nos hemos pasado, y con ella
+     el color, para que se vea de un vistazo sin tener que leer. #}
+  <div class="presupuesto {{ 'presupuesto-excedido' if plan.presupuesto_insuficiente }}">
+    <div class="presupuesto-cifras">
+      <div>
+        <span class="etiqueta">Total de la compra</span>
+        <strong class="cifra-grande">{{ plan.coste_total | euros }}</strong>
+      </div>
+      <div class="alineado-derecha">
+        <span class="etiqueta">Tu presupuesto</span>
+        <strong class="cifra-media">{{ plan.presupuesto | euros }}</strong>
+      </div>
+    </div>
+    <div class="barra">
+      <div class="barra-relleno" style="width: {{ plan.porcentaje_presupuesto }}%"></div>
+    </div>
+    {% if plan.presupuesto_insuficiente %}
+      <p class="aviso aviso-error">
+        <strong>No cabe en el presupuesto.</strong>
+        Con {{ plan.presupuesto | euros }} no salen {{ plan.comidas_totales }} comidas
+        para {{ plan.personas }} persona{{ 's' if plan.personas > 1 }}.
+        Este es el plan más ajustado que he encontrado y cuesta
+        {{ plan.coste_total | euros }}. Prueba a subir el presupuesto o a reducir
+        las semanas.
+      </p>
+    {% else %}
+      <p class="aviso aviso-ok">
+        Te sobran <strong>{{ plan.dinero_sobrante | euros }}</strong>.
+        Son {{ total_productos }} productos en total.
+      </p>
+    {% endif %}
+  </div>
+</section>
+
+{% if plan.ingredientes_sin_producto %}
+  <p class="aviso aviso-atencion">
+    No he encontrado producto en Mercadona para:
+    <strong>{{ plan.ingredientes_sin_producto | join(', ') }}</strong>.
+    No están contados en el total, tendrás que buscarlos tú.
+  </p>
+{% endif %}
+
+{# --- LAS RECETAS ---------------------------------------------------------- #}
+<section class="bloque">
+  <h2>Qué vas a cocinar</h2>
+  <p class="bloque-ayuda">
+    {{ plan.elegidas | length }} recetas distintas. Cada una da para varias
+    comidas: cocinas la cazuela entera y comes de ella varias veces.
+  </p>
+
+  <div class="rejilla-recetas">
+    {% for elegida in plan.elegidas %}
+      <a class="tarjeta-receta" href="{{ url_for('ficha_receta', id_receta=elegida.receta.id) }}">
+        {# loading="lazy" hace que el navegador no descargue las imagenes que
+           todavia no se ven en pantalla. Con 15 collages se nota. #}
+        <img src="{{ url_for('imagen_receta', id_receta=elegida.receta.id) }}"
+             alt="{{ elegida.receta.nombre }}" loading="lazy">
+        <div class="tarjeta-receta-cuerpo">
+          <h3>{{ elegida.receta.nombre }}</h3>
+          <p class="tarjeta-receta-datos">
+            {{ elegida.receta.minutos }} min ·
+            {{ elegida.raciones_totales }} raciones
+            {%- if elegida.veces > 1 %}
+              <span class="insignia">se cocina {{ elegida.veces }} veces</span>
+            {% endif %}
+          </p>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+{# --- EL CALENDARIO -------------------------------------------------------- #}
+<section class="bloque">
+  <h2>El menú, día a día</h2>
+  <p class="bloque-ayuda">
+    Las recetas se reparten alternándolas, para que no comas lo mismo dos días
+    seguidos. Puedes cambiar el orden a tu gusto: la lista de la compra es la
+    misma.
+  </p>
+
+  <div class="tabla-scroll">
+    <table class="calendario">
+      <thead>
+        <tr>
+          <th>Semana</th>
+          <th>Día</th>
+          <th>Comida</th>
+          <th>Cena</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fila in plan.menu %}
+          <tr {{ 'class=inicio-semana' if fila.numero_dia == 1 }}>
+            <td class="celda-semana">{{ fila.semana if fila.numero_dia == 1 else '' }}</td>
+            <td class="celda-dia">{{ fila.dia }}</td>
+            {% for momento in ['comida', 'cena'] %}
+              <td>
+                {% if fila[momento] %}
+                  <a href="{{ url_for('ficha_receta', id_receta=fila[momento].id) }}">
+                    {{ fila[momento].nombre }}
+                  </a>
+                {% else %}
+                  <span class="vacio">— sin cubrir —</span>
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{# --- LA LISTA DE LA COMPRA ------------------------------------------------ #}
+<section class="bloque" id="compra">
+  <div class="bloque-cabecera">
+    <h2>Tu lista de la compra</h2>
+    {# window.print() abre el dialogo de imprimir del navegador. Desde ahi se
+       puede guardar como PDF, que es la forma mas facil de llevarsela al
+       supermercado en el movil. #}
+    <button class="boton-secundario" onclick="window.print()">Imprimir o guardar en PDF</button>
+  </div>
+  <p class="bloque-ayuda">
+    Agrupada por sección del supermercado, para que hagas un solo recorrido.
+  </p>
+
+  {% for grupo in compra %}
+    <div class="seccion-compra {{ 'seccion-despensa' if grupo.es_despensa }}">
+      <h3 class="seccion-titulo">
+        <span>{{ grupo.seccion }}</span>
+        <span class="seccion-total">{{ grupo.total | euros }}</span>
+      </h3>
+
+      {% if grupo.es_despensa %}
+        <p class="nota-despensa">
+          {% if plan.despensa_en_casa %}
+            Has dicho que ya los tienes en casa, así que <strong>no suman al
+            total</strong>. Si te falta alguno, costaría
+            {{ grupo.precio_tienda | euros }}.
+          {% else %}
+            Duran meses: los compras una vez y te sirven para muchas compras.
+            Si ya los tienes, vuelve atrás y marca la casilla de despensa para
+            que no cuenten.
+          {% endif %}
+        </p>
+      {% endif %}
+
+      <ul class="lista-compra">
+        {% for linea in grupo.lineas %}
+          <li class="linea-compra">
+            {% if linea.sin_producto %}
+              <div class="linea-texto">
+                <strong>{{ linea.ingrediente.nombre }}</strong>
+                <span class="linea-detalle">
+                  {{ linea.gramos_necesarios | gramos }} — sin producto encontrado
+                </span>
+              </div>
+            {% else %}
+              <img class="foto-producto" src="{{ linea.producto.url_imagen }}"
+                   alt="" loading="lazy">
+              <div class="linea-texto">
+                <strong>{{ linea.producto.nombre }}</strong>
+                <span class="linea-detalle">
+                  {{ linea.producto.precio | euros }} el envase
+                  {%- if linea.producto.precio_referencia %}
+                    · {{ linea.producto.precio_referencia | euros }}/{{ linea.producto.formato_referencia }}
+                  {%- endif %}
+                  {%- if linea.producto.peso_aproximado %}
+                    · <span class="nota">peso aproximado</span>
+                  {%- endif %}
+                </span>
+                <span class="linea-detalle linea-necesario">
+                  Necesitas {{ linea.gramos_necesarios | gramos }}
+                  {%- if linea.sobra_gramos > 50 %}
+                    · sobran {{ linea.sobra_gramos | gramos }}
+                  {%- endif %}
+                </span>
+              </div>
+              <div class="linea-numeros">
+                <span class="unidades">{{ linea.unidades }} ud</span>
+                {% if linea.se_cobra %}
+                  <strong class="subtotal">{{ linea.coste | euros }}</strong>
+                {% else %}
+                  {# Tachado: lo enseñamos para que sepas cuánto vale, pero no
+                     cuenta en el total porque ya lo tienes. #}
+                  <strong class="subtotal subtotal-nocuenta">{{ linea.coste | euros }}</strong>
+                  <span class="unidades">ya lo tienes</span>
+                {% endif %}
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endfor %}
+
+  <div class="total-final">
+    <span>
+      Total de la compra
+      {%- if plan.despensa_en_casa %}
+        <small>(sin la despensa que ya tienes)</small>
+      {%- endif %}
+    </span>
+    <strong>{{ plan.coste_total | euros }}</strong>
+  </div>
+</section>
+
+{# --- EL INFORME NUTRICIONAL ----------------------------------------------- #}
+<section class="bloque">
+  <h2>Qué tal come con este plan</h2>
+  <p class="bloque-ayuda">
+    Medias por persona y día, contando comidas, cenas
+    {%- if plan.con_desayunos %} y desayunos{% else %}, sin contar desayunos{% endif %}.
+  </p>
+
+  <div class="nutricion">
+    <div class="macro macro-{{ semaforo.estado }}">
+      <span class="macro-valor">{{ plan.kcal_dia | round | int }}</span>
+      <span class="macro-nombre">kcal / día</span>
+      <span class="macro-referencia">referencia: 2.000</span>
+    </div>
+    <div class="macro {{ 'macro-bien' if semaforo.proteina_ok else 'macro-bajo' }}">
+      <span class="macro-valor">{{ plan.proteina_dia | round | int }} g</span>
+      <span class="macro-nombre">proteína</span>
+      <span class="macro-referencia">referencia: 55-70 g</span>
+    </div>
+    <div class="macro">
+      <span class="macro-valor">{{ plan.hidratos_dia | round | int }} g</span>
+      <span class="macro-nombre">hidratos</span>
+    </div>
+    <div class="macro">
+      <span class="macro-valor">{{ plan.grasa_dia | round | int }} g</span>
+      <span class="macro-nombre">grasas</span>
+    </div>
+  </div>
+
+  <p class="aviso aviso-info">{{ semaforo.mensaje }}</p>
+  <p class="letra-pequena">
+    Estos valores son orientativos: salen de tablas de composición de alimentos
+    por ingrediente, no del producto concreto de Mercadona (su API no da datos
+    nutricionales). Sirven para hacerte una idea, no como herramienta médica.
+  </p>
+</section>
+
+<p class="volver">
+  <a class="boton-secundario" href="{{ url_for('inicio') }}">← Probar con otros datos</a>
+</p>
+
+{% endblock %}

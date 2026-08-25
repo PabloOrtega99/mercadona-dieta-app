@@ -1,0 +1,29 @@
+{# Se ensena cuando falta algun paso previo (catalogo sin descargar, etc.).
+   La idea es que en vez de un error incomprensible, salga exactamente el
+   comando que hay que ejecutar para arreglarlo. #}
+{% extends "base.html" %}
+
+{% block titulo %}Falta un paso previo{% endblock %}
+
+{% block contenido %}
+
+<section class="tarjeta panel-error">
+  <h1>Falta preparar algo antes de empezar</h1>
+  {# La marca "pre" conserva los saltos de linea del mensaje tal cual. #}
+  <pre class="mensaje-error">{{ mensaje }}</pre>
+
+  <h2>Qué hacer</h2>
+  <ol class="lista-pasos">
+    <li>Abre PowerShell en la carpeta del proyecto.</li>
+    <li>Activa el entorno: <code>.\.venv\Scripts\Activate.ps1</code></li>
+    <li>Ejecuta el comando que aparece ahí arriba.</li>
+    <li>Vuelve aquí y pulsa <a href="{{ url_for('recargar') }}">Recargar datos</a>.</li>
+  </ol>
+
+  <p class="letra-pequena">
+    Si es la primera vez que usas el proyecto en este ordenador, el orden
+    completo está en <code>docs/02-python-entorno-virtual.md</code>.
+  </p>
+</section>
+
+{% endblock %}

@@ -1,0 +1,13 @@
+<!-- Se usa cuando no se ha podido montar el collage de una receta (por ejemplo,
+     si no hay internet para descargar las fotos de los productos). Asi el
+     hueco de la tarjeta se ve limpio en vez de con el icono de imagen rota. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 684">
+  <rect width="600" height="684" fill="#f3f0ea"/>
+  <g fill="none" stroke="#c9c4ba" stroke-width="10" stroke-linejoin="round">
+    <path d="M225 265h150l-17 120a16 16 0 0 1-16 14h-84a16 16 0 0 1-16-14l-17-120Z"/>
+    <path d="M262 265a38 38 0 0 1 76 0" stroke-linecap="round"/>
+  </g>
+  <text x="300" y="470" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif"
+        font-size="26" fill="#a49e94">Sin imagen</text>
+  <rect y="600" width="600" height="84" fill="#1c2026"/>
+</svg>

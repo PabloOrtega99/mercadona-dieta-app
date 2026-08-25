@@ -1,0 +1,33 @@
+# ---------------------------------------------------------------------------
+# requirements.txt — La lista de librerías que necesita este proyecto.
+#
+# Una "librería" es código que ha escrito otra gente y que nosotros
+# reutilizamos en vez de programarlo desde cero.
+#
+# Para instalarlas todas de golpe (en cualquier ordenador):
+#     pip install -r requirements.txt
+#
+# El "==" fija la versión exacta, para que en tu portátil y en tu sobremesa
+# se instale EXACTAMENTE lo mismo y la app se comporte igual en los dos.
+# ---------------------------------------------------------------------------
+
+# Flask: el "servidor web". Es quien recibe lo que escribes en el navegador
+# y decide qué página HTML devolverte. Trae Jinja2 incluido (las plantillas).
+Flask==3.1.0
+
+# requests: para hacer peticiones a internet, o sea, para hablar con la API
+# de Mercadona y bajarnos los productos y los precios.
+requests==2.32.3
+
+# Pillow: para manipular imágenes. La usamos para montar el collage con las
+# fotos de los ingredientes de cada receta.
+#
+# NOTA (esto ya nos pasó): al montar el proyecto probé con pillow==11.1.0 y
+# falló. Pillow lleva partes escritas en C que hay que compilar, y sus autores
+# publican versiones ya compiladas ("wheels") solo para las versiones de Python
+# que soportan. La 11.1.0 es anterior a Python 3.14, así que pip intentó
+# compilarla en el momento, no encontró el compilador ni la librería zlib, y
+# reventó. La 12.3.0 sí trae la versión ya compilada para Python 3.14.
+# Moraleja: si al instalar algo ves "building wheel ... error", casi siempre se
+# arregla subiendo la versión de esa librería.
+pillow==12.3.0

@@ -1,0 +1,24 @@
+{
+  "_ayuda": {
+    "que_es": "La app planifica comida y cena (14 comidas por semana). El desayuno no se planifica como receta porque en la practica desayunas casi siempre lo mismo. En su lugar tenemos esta lista fija de basicos, que se anade a la cesta y al presupuesto para que las cuentas cuadren con la realidad.",
+    "campos": {
+      "ingrediente": "Id de un ingrediente de ingredientes.json.",
+      "gramos_persona_semana": "Cuanto consume una persona en una semana. Se multiplica por las personas y por las semanas del plan.",
+      "alternativas": "Que poner en su lugar segun la dieta. Un valor null significa 'en esa dieta, no lo pongas'. Sin esto, un plan vegano acabaria con leche de vaca en la cesta, que es justo lo que no puede pasar.",
+      "nota": "Solo para que se entienda de donde sale la cantidad."
+    },
+    "como_cambiarlo": "Ajusta las cantidades a lo que desayunes tu de verdad, o quita lo que no tomes. Si desmarcas la casilla de desayunos en la web, esta lista se ignora entera."
+  },
+
+  "basicos": [
+    { "ingrediente": "leche",         "gramos_persona_semana": 1750, "alternativas": { "vegana": "bebida_soja" }, "nota": "250 ml al dia" },
+    { "ingrediente": "cafe",          "gramos_persona_semana": 60,   "alternativas": {}, "nota": "unos 8 g por taza" },
+    { "ingrediente": "pan_molde",     "gramos_persona_semana": 420,  "alternativas": {}, "nota": "2 rebanadas al dia" },
+    { "ingrediente": "avena",         "gramos_persona_semana": 210,  "alternativas": {}, "nota": "30 g al dia" },
+    { "ingrediente": "yogur_natural", "gramos_persona_semana": 500,  "alternativas": { "vegana": null }, "nota": "4 yogures a la semana; en vegana se sustituye por mas fruta" },
+    { "ingrediente": "platano",       "gramos_persona_semana": 600,  "alternativas": {}, "nota": "5 piezas a la semana" },
+    { "ingrediente": "manzana",       "gramos_persona_semana": 540,  "alternativas": {}, "nota": "3 piezas a la semana" },
+    { "ingrediente": "naranja",       "gramos_persona_semana": 600,  "alternativas": {}, "nota": "3 piezas a la semana" },
+    { "ingrediente": "azucar",        "gramos_persona_semana": 70,   "alternativas": {}, "nota": "10 g al dia" }
+  ]
+}

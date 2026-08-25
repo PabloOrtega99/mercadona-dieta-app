@@ -1,0 +1,1220 @@
+{
+  "_ayuda": "Que producto de Mercadona se compra para cada ingrediente. Lo genera 'python scripts/revisar_emparejamientos.py --regenerar'. Si algun emparejamiento no te gusta, cambia la lista 'productos' (son ids de Mercadona, los ves en la url del producto en tienda.mercadona.es) y pon \"fijado\": true para que no te lo pise la proxima regeneracion. El campo '_nombres' es solo para que puedas leerlo; no se usa para nada.",
+  "aceite_oliva": {
+    "fijado": false,
+    "productos": [
+      "14727",
+      "4717",
+      "4740"
+    ],
+    "_nombres": [
+      "Aceite de oliva virgen extra Hacendado",
+      "Aceite de oliva virgen extra Hacendado",
+      "Aceite de oliva virgen extra Hacendado"
+    ]
+  },
+  "aceitunas": {
+    "fijado": false,
+    "productos": [
+      "52733",
+      "13422",
+      "52734"
+    ],
+    "_nombres": [
+      "Aceitunas negras sin hueso Hacendado",
+      "Aceitunas verdes estilo casero Hacendado partidas aliñadas",
+      "Aceitunas negras sin hueso Hacendado"
+    ]
+  },
+  "aguacate": {
+    "fijado": false,
+    "productos": [
+      "3858",
+      "3830",
+      "14283"
+    ],
+    "_nombres": [
+      "Aguacates",
+      "Aguacate",
+      "Aguacate en dados Hacendado congelado"
+    ]
+  },
+  "ajo": {
+    "fijado": false,
+    "productos": [
+      "61251",
+      "61288",
+      "86656",
+      "60873"
+    ],
+    "_nombres": [
+      "Ajo troceado Hacendado ultracongelado",
+      "Ajo tierno Hacendado ultracongelado",
+      "Ajo granulado Hacendado",
+      "Ajo y Perejil Hacendado"
+    ]
+  },
+  "almendras": {
+    "fijado": false,
+    "productos": [
+      "34865"
+    ],
+    "_nombres": [
+      "Almendra natural Hacendado"
+    ]
+  },
+  "alubias_cocidas": {
+    "fijado": false,
+    "productos": [
+      "26019",
+      "26028"
+    ],
+    "_nombres": [
+      "Alubia cocida blanca Hacendado",
+      "Alubia cocida blanca Hacendado"
+    ]
+  },
+  "arroz": {
+    "fijado": false,
+    "productos": [
+      "5044",
+      "5042",
+      "5024"
+    ],
+    "_nombres": [
+      "Arroz redondo Hacendado",
+      "Arroz redondo J Sendra Hacendado",
+      "Arroz redondo SOS"
+    ]
+  },
+  "arroz_integral": {
+    "fijado": false,
+    "productos": [
+      "5184"
+    ],
+    "_nombres": [
+      "Arroz integral largo Hacendado"
+    ]
+  },
+  "atun_lata": {
+    "fijado": false,
+    "productos": [
+      "18018"
+    ],
+    "_nombres": [
+      "Atún claro al natural Hacendado"
+    ]
+  },
+  "avena": {
+    "fijado": false,
+    "productos": [
+      "86341",
+      "20292",
+      "9474"
+    ],
+    "_nombres": [
+      "Copos de avena Brüggen",
+      "Copos de avena integral con chocolate Hacendado",
+      "Copos avena tostada Hacendado con semillas y frutos secos"
+    ]
+  },
+  "azucar": {
+    "fijado": false,
+    "productos": [
+      "19897",
+      "19837"
+    ],
+    "_nombres": [
+      "Azúcar blanco Hacendado",
+      "Azúcar blanco en sobres Hacendado"
+    ]
+  },
+  "bacalao": {
+    "fijado": false,
+    "productos": [
+      "62050"
+    ],
+    "_nombres": [
+      "Lomo de bacalao MareDeus ultracongelado"
+    ]
+  },
+  "bacon": {
+    "fijado": false,
+    "productos": [
+      "16252",
+      "59170",
+      "21629",
+      "53500"
+    ],
+    "_nombres": [
+      "Bacón Hacendado cintas",
+      "Bacón ahumado sin corteza Monells",
+      "Bacón ahumado Monells lonchas",
+      "Bacón Oscar Mayer lonchas"
+    ]
+  },
+  "bebida_avena": {
+    "fijado": false,
+    "productos": [
+      "52639",
+      "52640",
+      "23908"
+    ],
+    "_nombres": [
+      "Bebida de avena Hacendado 0% azúcar",
+      "Bebida de avena Hacendado 0% azúcar",
+      "Bebida de avena Alitey"
+    ]
+  },
+  "bebida_soja": {
+    "fijado": false,
+    "productos": [
+      "14706",
+      "14707",
+      "29322"
+    ],
+    "_nombres": [
+      "Bebida de soja con calcio y vitaminas sin azúcares añadidos Hacendado",
+      "Bebida de soja con calcio y vitaminas sin azúcares añadidos Hacendado",
+      "Bebida de soja 0% azúcar Hacendado"
+    ]
+  },
+  "berenjena": {
+    "fijado": false,
+    "productos": [
+      "69326",
+      "19958"
+    ],
+    "_nombres": [
+      "Berenjena",
+      "Berenjenas de Almagro aliñada Antonio"
+    ]
+  },
+  "brocoli": {
+    "fijado": false,
+    "productos": [
+      "61261",
+      "69580"
+    ],
+    "_nombres": [
+      "Brócoli Hacendado ultracongelado",
+      "Brócoli"
+    ]
+  },
+  "cafe": {
+    "fijado": false,
+    "productos": [
+      "11178",
+      "13700",
+      "15922",
+      "11172"
+    ],
+    "_nombres": [
+      "Café molido natural Hacendado",
+      "Café molido fuerte Hacendado",
+      "Café molido mezcla Hacendado",
+      "Café molido natural Hacendado"
+    ]
+  },
+  "calabacin": {
+    "fijado": false,
+    "productos": [
+      "69338",
+      "69339"
+    ],
+    "_nombres": [
+      "Calabacín verde",
+      "Calabacín blanco"
+    ]
+  },
+  "calabaza": {
+    "fijado": false,
+    "productos": [
+      "3527"
+    ],
+    "_nombres": [
+      "Calabaza cacahuete cortada a trozos"
+    ]
+  },
+  "calamar": {
+    "fijado": false,
+    "productos": [
+      "63432",
+      "18713",
+      "24242",
+      "24417"
+    ],
+    "_nombres": [
+      "Calamar patagónico pequeño Hacendado ultracongelado",
+      "Calamar en salsa americana Hacendado",
+      "Calamar troceado limpio Hacendado congelado",
+      "Calamar grande Hacendado congelado"
+    ]
+  },
+  "caldo_pollo": {
+    "fijado": false,
+    "productos": [
+      "7313",
+      "7031",
+      "7024"
+    ],
+    "_nombres": [
+      "Caldo de pollo Hacendado",
+      "Caldo de pollo Hacendado bajo en sal",
+      "Caldo de pollo casero Gallina Blanca"
+    ]
+  },
+  "caldo_verduras": {
+    "fijado": false,
+    "productos": [
+      "7032"
+    ],
+    "_nombres": [
+      "Caldo de verduras Hacendado"
+    ]
+  },
+  "canela": {
+    "fijado": false,
+    "productos": [
+      "34177"
+    ],
+    "_nombres": [
+      "Canela molida Hacendado"
+    ]
+  },
+  "carne_picada_mixta": {
+    "fijado": false,
+    "productos": [
+      "3453",
+      "2869"
+    ],
+    "_nombres": [
+      "Preparado de carne picada vacuno y cerdo",
+      "Preparado de carne picada vacuno y cerdo"
+    ]
+  },
+  "carne_picada_ternera": {
+    "fijado": false,
+    "productos": [
+      "3454",
+      "2868",
+      "52776"
+    ],
+    "_nombres": [
+      "Preparado de carne picada vacuno",
+      "Preparado de carne picada vacuno",
+      "Preparado de carne picada vacuno Hacendado"
+    ]
+  },
+  "cebolla": {
+    "fijado": false,
+    "productos": [
+      "69079",
+      "69089",
+      "69155",
+      "69162"
+    ],
+    "_nombres": [
+      "Cebollas",
+      "Cebollas",
+      "Cebollas dulces",
+      "Cebollas rojas"
+    ]
+  },
+  "champinones": {
+    "fijado": false,
+    "productos": [
+      "16618",
+      "16616",
+      "16625",
+      "26951"
+    ],
+    "_nombres": [
+      "Champiñones laminados Hacendado",
+      "Champiñón laminado Hacendado",
+      "Champiñón entero Hacendado",
+      "Champiñones blancos"
+    ]
+  },
+  "chorizo": {
+    "fijado": false,
+    "productos": [
+      "6048",
+      "12073",
+      "59086",
+      "20147"
+    ],
+    "_nombres": [
+      "Chorizo oreado",
+      "Chorizo Pamplona extra Hacendado lonchas",
+      "Chorizo extra Hacendado lonchas",
+      "Chorizo extra pimienta Hacendado finas lonchas"
+    ]
+  },
+  "coliflor": {
+    "fijado": false,
+    "productos": [
+      "61231",
+      "69220"
+    ],
+    "_nombres": [
+      "Coliflor Hacendado ultracongelada",
+      "Coliflor"
+    ]
+  },
+  "comino": {
+    "fijado": false,
+    "productos": [
+      "34120"
+    ],
+    "_nombres": [
+      "Comino molido Hacendado"
+    ]
+  },
+  "curry": {
+    "fijado": false,
+    "productos": [
+      "34125"
+    ],
+    "_nombres": [
+      "Curry Hacendado"
+    ]
+  },
+  "cuscus": {
+    "fijado": false,
+    "productos": [
+      "9395"
+    ],
+    "_nombres": [
+      "Cous cous mediano Hacendado"
+    ]
+  },
+  "dorada": {
+    "fijado": false,
+    "productos": [
+      "87300"
+    ],
+    "_nombres": [
+      "Dorada limpia"
+    ]
+  },
+  "espaguetis": {
+    "fijado": false,
+    "productos": [
+      "6245",
+      "6331",
+      "35904"
+    ],
+    "_nombres": [
+      "Spaghetti Hacendado",
+      "Spaghetti Hacendado",
+      "Spaghetti Armando"
+    ]
+  },
+  "espinacas": {
+    "fijado": false,
+    "productos": [
+      "61279",
+      "35781",
+      "69730"
+    ],
+    "_nombres": [
+      "Espinaca en porciones Hacendado ultracongelada",
+      "Espinaca picada en porciones Hacendado ultracongelada",
+      "Espinacas cortadas y lavadas"
+    ]
+  },
+  "fideos": {
+    "fijado": false,
+    "productos": [
+      "6256"
+    ],
+    "_nombres": [
+      "Fideo mediano Hacendado"
+    ]
+  },
+  "filete_ternera": {
+    "fijado": false,
+    "productos": [
+      "8936"
+    ],
+    "_nombres": [
+      "Filetes de vacuno añojo para plancha"
+    ]
+  },
+  "fresa": {
+    "fijado": false,
+    "productos": [
+      "61092",
+      "3723"
+    ],
+    "_nombres": [
+      "Fresas enteras Hacendado ultracongeladas",
+      "Fresas"
+    ]
+  },
+  "gambas": {
+    "fijado": false,
+    "productos": [
+      "24181",
+      "24230"
+    ],
+    "_nombres": [
+      "Gamba pelada cruda tamaño mediano Hacendado ultracongelada",
+      "Gamba pelada cruda tamaño grande Hacendado ultracongelada"
+    ]
+  },
+  "garbanzos": {
+    "fijado": false,
+    "productos": [
+      "5220"
+    ],
+    "_nombres": [
+      "Garbanzo lechoso Andaluz Hacendado"
+    ]
+  },
+  "garbanzos_cocidos": {
+    "fijado": false,
+    "productos": [
+      "26029",
+      "26033",
+      "26039"
+    ],
+    "_nombres": [
+      "Garbanzo cocido Hacendado",
+      "Garbanzo cocido Pedrosillano Hacendado",
+      "Garbanzo cocido Hacendado"
+    ]
+  },
+  "guisantes": {
+    "fijado": false,
+    "productos": [
+      "61215",
+      "16416",
+      "16415",
+      "61200"
+    ],
+    "_nombres": [
+      "Guisante fino Hacendado ultracongelado",
+      "Guisantes extra Hacendado",
+      "Guisantes extra Hacendado",
+      "Guisante muy tierno Hacendado ultracongelado"
+    ]
+  },
+  "harina": {
+    "fijado": false,
+    "productos": [
+      "29106",
+      "29100",
+      "29134"
+    ],
+    "_nombres": [
+      "Harina de trigo grande Hacendado",
+      "Harina de trigo Hacendado",
+      "Harina integral de trigo Hacendado"
+    ]
+  },
+  "huevo": {
+    "fijado": false,
+    "productos": [
+      "31504",
+      "31540",
+      "31592"
+    ],
+    "_nombres": [
+      "Huevos grandes L",
+      "Huevos grandes L",
+      "Huevos super grandes XL"
+    ]
+  },
+  "jamon_cocido": {
+    "fijado": false,
+    "productos": [
+      "16395",
+      "13988",
+      "16352"
+    ],
+    "_nombres": [
+      "Jamón cocido Hacendado finas lonchas",
+      "Jamón cocido sándwich Hacendado lonchas",
+      "Jamón cocido jugoso Hacendado lonchas"
+    ]
+  },
+  "jamon_serrano": {
+    "fijado": false,
+    "productos": [
+      "59071"
+    ],
+    "_nombres": [
+      "Taquitos de jamón Incarlopsa"
+    ]
+  },
+  "judias_verdes": {
+    "fijado": false,
+    "productos": [
+      "61283",
+      "61282",
+      "16315"
+    ],
+    "_nombres": [
+      "Judía verde plana Hacendado ultracongelada",
+      "Judía verde redonda Hacendado ultracongelada",
+      "Judías verdes redondas Hacendado"
+    ]
+  },
+  "laurel": {
+    "fijado": false,
+    "productos": [
+      "47994"
+    ],
+    "_nombres": [
+      "Hoja de laurel Hacendado"
+    ]
+  },
+  "leche": {
+    "fijado": false,
+    "productos": [
+      "10379",
+      "10380",
+      "10533"
+    ],
+    "_nombres": [
+      "Leche entera Hacendado",
+      "Leche entera Hacendado",
+      "Leche entera Hacendado"
+    ]
+  },
+  "leche_coco": {
+    "fijado": false,
+    "productos": [
+      "17174"
+    ],
+    "_nombres": [
+      "Preparado de coco Hacendado"
+    ]
+  },
+  "lechuga": {
+    "fijado": false,
+    "productos": [
+      "69670",
+      "69435"
+    ],
+    "_nombres": [
+      "Lechuga iceberg cortada y lavada",
+      "Lechuga romana cortada y lavada"
+    ]
+  },
+  "lentejas": {
+    "fijado": false,
+    "productos": [
+      "5330"
+    ],
+    "_nombres": [
+      "Lenteja pardina Hacendado"
+    ]
+  },
+  "lentejas_cocidas": {
+    "fijado": false,
+    "productos": [
+      "26030",
+      "26011"
+    ],
+    "_nombres": [
+      "Lenteja cocida Hacendado",
+      "Lenteja cocida Hacendado"
+    ]
+  },
+  "limon": {
+    "fijado": false,
+    "productos": [
+      "3236",
+      "3210",
+      "17595"
+    ],
+    "_nombres": [
+      "Limones",
+      "Limón",
+      "Limón exprimido Hacendado"
+    ]
+  },
+  "lomo_cerdo": {
+    "fijado": false,
+    "productos": [
+      "4590"
+    ],
+    "_nombres": [
+      "Lomo de cerdo trozo"
+    ]
+  },
+  "macarrones": {
+    "fijado": false,
+    "productos": [
+      "6250",
+      "6326",
+      "52507"
+    ],
+    "_nombres": [
+      "Macarrón Hacendado",
+      "Macarrón Hacendado",
+      "Macarrones Mac & Cheese Bacon Hacendado gratinados"
+    ]
+  },
+  "maiz_dulce": {
+    "fijado": false,
+    "productos": [
+      "61289",
+      "69469",
+      "16712",
+      "16714"
+    ],
+    "_nombres": [
+      "Maíz dulce Hacendado ultracongelado",
+      "Maíz dulce en mazorca cocido",
+      "Maíz dulce Hacendado",
+      "Maíz dulce Hacendado"
+    ]
+  },
+  "mantequilla": {
+    "fijado": false,
+    "productos": [
+      "20716",
+      "20722",
+      "90933",
+      "20852"
+    ],
+    "_nombres": [
+      "Mantequilla sin sal añadida Hacendado",
+      "Mantequilla con sal Hacendado",
+      "Mantequilla light Hacendado",
+      "Mantequilla en porciones Hacendado sin sal añadida"
+    ]
+  },
+  "manzana": {
+    "fijado": false,
+    "productos": [
+      "3269",
+      "3028",
+      "3021"
+    ],
+    "_nombres": [
+      "Manzanas Golden",
+      "Manzana Golden",
+      "Manzana Granny Smith"
+    ]
+  },
+  "mayonesa": {
+    "fijado": false,
+    "productos": [
+      "13406",
+      "11550",
+      "52728"
+    ],
+    "_nombres": [
+      "Mayonesa Hacendado",
+      "Mayonesa Hacendado",
+      "Mayonesa Hacendado"
+    ]
+  },
+  "mejillones": {
+    "fijado": false,
+    "productos": [
+      "85144",
+      "85145"
+    ],
+    "_nombres": [
+      "Mejillón vivo",
+      "Mejillón vivo selección"
+    ]
+  },
+  "menestra": {
+    "fijado": false,
+    "productos": [
+      "52534"
+    ],
+    "_nombres": [
+      "Menestra de verduras Hacendado ultracongelada"
+    ]
+  },
+  "merluza": {
+    "fijado": false,
+    "productos": [
+      "62228",
+      "26760"
+    ],
+    "_nombres": [
+      "Filetes de merluza del Cabo sin piel Hacendado ultracongelados",
+      "Filetes de merluza  grandes del Cabo sin piel Hacendado ultracongelados"
+    ]
+  },
+  "miel": {
+    "fijado": false,
+    "productos": [
+      "15436",
+      "15430",
+      "15448"
+    ],
+    "_nombres": [
+      "Miel de flores Hacendado",
+      "Miel de flores Hacendado",
+      "Miel de naranjo Hacendado"
+    ]
+  },
+  "mostaza": {
+    "fijado": false,
+    "productos": [
+      "23410",
+      "17228"
+    ],
+    "_nombres": [
+      "Mostaza clásica Hacendado",
+      "Mostaza de Dijon Hacendado"
+    ]
+  },
+  "mozzarella": {
+    "fijado": false,
+    "productos": [
+      "51050",
+      "51230",
+      "51052"
+    ],
+    "_nombres": [
+      "Mozzarella fresca de vaca Hacendado",
+      "Mozzarella fresca light de vaca Hacendado",
+      "Mozzarella fresca de vaca Hacendado en perlas"
+    ]
+  },
+  "muslo_pollo": {
+    "fijado": false,
+    "productos": [
+      "2777",
+      "2789",
+      "25258"
+    ],
+    "_nombres": [
+      "Contramuslos de pollo sin piel",
+      "Contramuslos de pollo deshuesados y sin piel",
+      "Contramuslos deshuesados y sin piel de pollo certificado alimentado con un 50% de maíz"
+    ]
+  },
+  "naranja": {
+    "fijado": false,
+    "productos": [
+      "3485",
+      "3277",
+      "3235"
+    ],
+    "_nombres": [
+      "Naranjas",
+      "Naranjas",
+      "Naranja de mesa"
+    ]
+  },
+  "nata_cocinar": {
+    "fijado": false,
+    "productos": [
+      "10199",
+      "10161",
+      "10117"
+    ],
+    "_nombres": [
+      "Nata ligera para cocinar Hacendado",
+      "Nata ligera para cocinar Hacendado",
+      "Nata fresca para cocinar Hacendado"
+    ]
+  },
+  "nueces": {
+    "fijado": false,
+    "productos": [
+      "34606",
+      "34024"
+    ],
+    "_nombres": [
+      "Nuez natural Hacendado",
+      "Nuez natural Hacendado pelada"
+    ]
+  },
+  "oregano": {
+    "fijado": false,
+    "productos": [
+      "5598"
+    ],
+    "_nombres": [
+      "Orégano Hacendado"
+    ]
+  },
+  "pan": {
+    "fijado": false,
+    "productos": [
+      "83560",
+      "83202.1",
+      "23086.1"
+    ],
+    "_nombres": [
+      "Barra de pan tradicional",
+      "Barra de pan",
+      "Barra pan de pueblo"
+    ]
+  },
+  "pan_molde": {
+    "fijado": false,
+    "productos": [
+      "83867",
+      "83886",
+      "13810",
+      "82322"
+    ],
+    "_nombres": [
+      "Pan de molde blanco familiar Hacendado",
+      "Pan de molde 100% integral familiar Hacendado",
+      "Pan de molde blanco Hacendado",
+      "Pan de molde blanco sin corteza Hacendado"
+    ]
+  },
+  "pan_rallado": {
+    "fijado": false,
+    "productos": [
+      "82219",
+      "82352",
+      "82656"
+    ],
+    "_nombres": [
+      "Pan rallado Hacendado",
+      "Pan rallado casero Hacendado",
+      "Pan rallado de arroz Hacendado"
+    ]
+  },
+  "patata": {
+    "fijado": false,
+    "productos": [
+      "69099",
+      "69166",
+      "69098"
+    ],
+    "_nombres": [
+      "Patatas",
+      "Patatas",
+      "Patatas rojas"
+    ]
+  },
+  "pechuga_pavo": {
+    "fijado": false,
+    "productos": [
+      "2794",
+      "14031"
+    ],
+    "_nombres": [
+      "Filetes pechuga de pavo",
+      "Filetes pechuga de pavo marinados extra tiernos"
+    ]
+  },
+  "pechuga_pollo": {
+    "fijado": false,
+    "productos": [
+      "3653",
+      "2787",
+      "3400"
+    ],
+    "_nombres": [
+      "Filetes pechuga de pollo extra tiernos",
+      "Filetes pechuga de pollo",
+      "Filetes pechuga de pollo corte fino"
+    ]
+  },
+  "pepino": {
+    "fijado": false,
+    "productos": [
+      "69584",
+      "69964"
+    ],
+    "_nombres": [
+      "Pepino",
+      "Pepino holandés"
+    ]
+  },
+  "pera": {
+    "fijado": false,
+    "productos": [
+      "3119"
+    ],
+    "_nombres": [
+      "Pera Conferencia"
+    ]
+  },
+  "pimenton": {
+    "fijado": false,
+    "productos": [
+      "60573",
+      "34102"
+    ],
+    "_nombres": [
+      "Pimentón dulce Hacendado",
+      "Pimentón dulce de la Vera Hacendado"
+    ]
+  },
+  "pimienta": {
+    "fijado": false,
+    "productos": [
+      "34171",
+      "34172"
+    ],
+    "_nombres": [
+      "Pimienta negra molida Hacendado",
+      "Pimienta negra en grano Hacendado"
+    ]
+  },
+  "pimiento_rojo": {
+    "fijado": false,
+    "productos": [
+      "69310"
+    ],
+    "_nombres": [
+      "Pimiento rojo"
+    ]
+  },
+  "pimiento_verde": {
+    "fijado": false,
+    "productos": [
+      "69320",
+      "69312"
+    ],
+    "_nombres": [
+      "Pimiento verde freír",
+      "Pimiento verde"
+    ]
+  },
+  "placas_lasana": {
+    "fijado": false,
+    "productos": [
+      "6856"
+    ],
+    "_nombres": [
+      "Placas para lasaña precocidas El Pavo"
+    ]
+  },
+  "platano": {
+    "fijado": false,
+    "productos": [
+      "3819"
+    ],
+    "_nombres": [
+      "Plátano de Canarias IGP"
+    ]
+  },
+  "puerro": {
+    "fijado": false,
+    "productos": [
+      "68408"
+    ],
+    "_nombres": [
+      "Puerros"
+    ]
+  },
+  "queso_fresco": {
+    "fijado": false,
+    "productos": [
+      "52406",
+      "52408",
+      "52409"
+    ],
+    "_nombres": [
+      "Queso fresco Burgos natural Hacendado",
+      "Queso fresco Burgos natural Hacendado",
+      "Queso fresco Burgos desnatado 0% MG Hacendado"
+    ]
+  },
+  "queso_rallado": {
+    "fijado": false,
+    "productos": [
+      "23622",
+      "23621",
+      "22216"
+    ],
+    "_nombres": [
+      "Queso rallado especial fundir mezcla Hacendado",
+      "Queso rallado especial fundir mezcla Hacendado",
+      "Queso rallado emmental gratinar Hacendado"
+    ]
+  },
+  "quinoa": {
+    "fijado": false,
+    "productos": [
+      "9430"
+    ],
+    "_nombres": [
+      "Quinoa Hacendado"
+    ]
+  },
+  "sal": {
+    "fijado": false,
+    "productos": [
+      "19731",
+      "19732",
+      "16864"
+    ],
+    "_nombres": [
+      "Sal fina Hacendado",
+      "Sal yodada fina Hacendado",
+      "Sal fina de mesa Hacendado"
+    ]
+  },
+  "salmon": {
+    "fijado": false,
+    "productos": [
+      "24350",
+      "87204"
+    ],
+    "_nombres": [
+      "Filete de salmón rosado salvaje con piel Hacendado ultracongelado",
+      "Filete de salmón"
+    ]
+  },
+  "salsa_soja": {
+    "fijado": false,
+    "productos": [
+      "17360"
+    ],
+    "_nombres": [
+      "Salsa de Soja Hacendado"
+    ]
+  },
+  "sardinas_lata": {
+    "fijado": false,
+    "productos": [
+      "18210",
+      "18214"
+    ],
+    "_nombres": [
+      "Sardinillas en aceite de oliva Hacendado",
+      "Sardinillas reducidas en sal en aceite de oliva Hacendado"
+    ]
+  },
+  "soja_texturizada": {
+    "fijado": false,
+    "productos": [
+      "13926"
+    ],
+    "_nombres": [
+      "Soja texturizada Luengo"
+    ]
+  },
+  "tofu": {
+    "fijado": false,
+    "productos": [
+      "51097"
+    ],
+    "_nombres": [
+      "Tofu firme Hacendado"
+    ]
+  },
+  "tomate": {
+    "fijado": false,
+    "productos": [
+      "69912",
+      "69975",
+      "69930"
+    ],
+    "_nombres": [
+      "Tomate pera",
+      "Tomates pera",
+      "Tomates cherry pera kumato"
+    ]
+  },
+  "tomate_frito": {
+    "fijado": false,
+    "productos": [
+      "17132",
+      "17151",
+      "17108"
+    ],
+    "_nombres": [
+      "Tomate frito Hacendado",
+      "Tomate frito Hacendado",
+      "Tomate frito Hacendado"
+    ]
+  },
+  "tomate_triturado": {
+    "fijado": false,
+    "productos": [
+      "16043",
+      "16044"
+    ],
+    "_nombres": [
+      "Tomate triturado Hacendado",
+      "Tomate triturado Hacendado"
+    ]
+  },
+  "tortilla_trigo": {
+    "fijado": false,
+    "productos": [
+      "80859",
+      "17567",
+      "80942"
+    ],
+    "_nombres": [
+      "Tortillas de trigo Hacendado",
+      "Tortillas de trigo Delibreads 30 cm",
+      "Tortillas de trigo integrales Hacendado"
+    ]
+  },
+  "vinagre": {
+    "fijado": false,
+    "productos": [
+      "4940"
+    ],
+    "_nombres": [
+      "Vinagre de vino blanco Hacendado"
+    ]
+  },
+  "vino_blanco": {
+    "fijado": false,
+    "productos": [
+      "66127",
+      "66105",
+      "37138"
+    ],
+    "_nombres": [
+      "Vino blanco Casón Histórico",
+      "Vino blanco Don Simón",
+      "Vino blanco Airén Sauvignon Blanc Fidencio DO La Mancha"
+    ]
+  },
+  "yogur_griego": {
+    "fijado": false,
+    "productos": [
+      "20559",
+      "52421",
+      "20512"
+    ],
+    "_nombres": [
+      "Yogur griego natural Hacendado",
+      "Yogur griego natural ligero Hacendado",
+      "Yogur griego natural Hacendado"
+    ]
+  },
+  "yogur_natural": {
+    "fijado": false,
+    "productos": [
+      "22313",
+      "20260",
+      "20287"
+    ],
+    "_nombres": [
+      "Yogur natural Hacendado",
+      "Yogur natural Danone",
+      "Yogur natural de cabra Hacendado"
+    ]
+  },
+  "zanahoria": {
+    "fijado": false,
+    "productos": [
+      "69586",
+      "69669",
+      "13328"
+    ],
+    "_nombres": [
+      "Zanahorias",
+      "Zanahorias",
+      "Zanahoria en tiras Hacendado"
+    ]
+  }
+}

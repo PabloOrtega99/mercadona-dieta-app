@@ -1,0 +1,62 @@
+{# ===========================================================================
+   base.html - El esqueleto comun a todas las paginas.
+
+   Esto es una PLANTILLA de Jinja2. Es HTML normal con dos anadidos:
+
+     {{ algo }}       ->  aqui se pinta el valor de "algo"
+     {% si/para %}    ->  instrucciones (condiciones, bucles, bloques)
+
+   Y el mecanismo clave de este archivo: {% block %}. Define huecos que las
+   otras plantillas rellenan. Asi la cabecera, el pie y el <head> se escriben
+   UNA sola vez aqui, y las demas paginas solo se preocupan de su contenido.
+
+   Los comentarios como este, entre llave-almohadilla, no llegan al navegador.
+   =========================================================================== #}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  {# Sin esta linea la web se ve diminuta en el movil. #}
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Menús y compra de Mercadona{% endblock %}</title>
+  {# url_for construye la direccion del CSS. Se usa en vez de escribir la ruta
+     a mano para que siga funcionando aunque la app cambie de sitio. #}
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='icono.svg') }}">
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="contenedor cabecera-fila">
+    <a class="logo" href="{{ url_for('inicio') }}">
+      <span class="logo-marca">Menú</span><span class="logo-resto">Mercadona</span>
+    </a>
+    {% if datos %}
+      <p class="cabecera-info">
+        {{ datos.total_productos }} productos ·
+        precios de {{ (datos.catalogo_actualizado or '')[:10] }}
+      </p>
+    {% endif %}
+  </div>
+</header>
+
+<main class="contenedor">
+  {% block contenido %}{% endblock %}
+</main>
+
+<footer class="pie">
+  <div class="contenedor">
+    <p>
+      Proyecto personal. Los precios vienen de la API pública de
+      tienda.mercadona.es y son los del día en que se descargó el catálogo.
+      Los valores nutricionales son orientativos.
+    </p>
+    <p class="pie-acciones">
+      Para actualizar precios: <code>python scripts/actualizar_catalogo.py</code>
+      · <a href="{{ url_for('recargar') }}">Recargar datos</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

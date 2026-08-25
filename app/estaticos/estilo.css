@@ -1,0 +1,584 @@
+/* ===========================================================================
+   estilo.css - Todo el aspecto de la aplicacion.
+
+   Esta escrito a mano, sin frameworks tipo Bootstrap ni Tailwind, porque para
+   una app de cuatro paginas esas herramientas anaden mas complejidad de la que
+   quitan (y Tailwind ademas necesitaria Node y un proceso de compilacion).
+
+   Esta organizado de arriba abajo asi:
+     1. Variables de color
+     2. Reglas basicas
+     3. Estructura (cabecera, pie, contenedor)
+     4. Componentes (tarjetas, botones, tablas...)
+     5. Movil
+     6. Impresion
+   =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   1. VARIABLES
+   Las "custom properties" (--nombre) son valores con nombre que se pueden
+   reutilizar en todo el archivo. Si un dia quieres cambiar el verde de la app,
+   lo cambias aqui una vez y cambia en todas partes.
+   --------------------------------------------------------------------------- */
+:root {
+  --verde: #00843d;          /* el verde de Mercadona */
+  --verde-oscuro: #00622d;
+  --verde-claro: #e6f4ec;
+
+  --tinta: #14181d;
+  --tinta-suave: #5b6672;
+  --tinta-tenue: #8b959f;
+
+  --fondo: #f6f5f2;
+  --papel: #ffffff;
+  --linea: #e3e1dc;
+
+  --rojo: #c0392b;
+  --rojo-claro: #fdecea;
+  --ambar: #b7791f;
+  --ambar-claro: #fdf6e3;
+
+  --radio: 12px;
+  --sombra: 0 1px 2px rgba(20, 24, 29, .06), 0 4px 14px rgba(20, 24, 29, .05);
+  --ancho: 1080px;
+}
+
+/* ---------------------------------------------------------------------------
+   2. BASICO
+   --------------------------------------------------------------------------- */
+
+/* border-box hace que el padding y el borde se cuenten DENTRO del ancho que
+   le das a un elemento. Sin esto, poner width:100% y padding:20px da un
+   elemento mas ancho que su contenedor, que es la causa de la mitad de los
+   desajustes de maquetacion de los principiantes. */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  /* La lista de tipografias es una cadena de respaldo: si no esta la primera,
+     el navegador prueba la siguiente. La ultima, sans-serif, es la generica
+     que existe siempre. */
+  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--tinta);
+  background: var(--fondo);
+}
+
+h1, h2, h3 { line-height: 1.25; margin: 0 0 .5rem; font-weight: 700; }
+h1 { font-size: 1.9rem; letter-spacing: -.02em; }
+h2 { font-size: 1.3rem; }
+h3 { font-size: 1.05rem; }
+p { margin: 0 0 .75rem; }
+
+a { color: var(--verde-oscuro); }
+a:hover { color: var(--verde); }
+
+code {
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: .87em;
+  background: #ecebe7;
+  padding: .15em .4em;
+  border-radius: 5px;
+}
+
+.letra-pequena { font-size: .85rem; color: var(--tinta-suave); }
+.alineado-derecha { text-align: right; }
+
+/* ---------------------------------------------------------------------------
+   3. ESTRUCTURA
+   --------------------------------------------------------------------------- */
+
+.contenedor {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.cabecera {
+  background: var(--papel);
+  border-bottom: 1px solid var(--linea);
+  position: sticky;   /* se queda pegada arriba al hacer scroll */
+  top: 0;
+  z-index: 10;
+}
+.cabecera-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 60px;
+}
+.logo { text-decoration: none; font-size: 1.15rem; font-weight: 800; letter-spacing: -.02em; }
+.logo-marca { color: var(--verde); }
+.logo-resto { color: var(--tinta); }
+.cabecera-info { margin: 0; font-size: .8rem; color: var(--tinta-tenue); }
+
+main { padding: 2rem 0 3rem; }
+
+.pie {
+  border-top: 1px solid var(--linea);
+  padding: 1.5rem 0 2.5rem;
+  font-size: .82rem;
+  color: var(--tinta-suave);
+}
+.pie p { margin: 0 0 .4rem; }
+.pie-acciones { color: var(--tinta-tenue); }
+
+/* ---------------------------------------------------------------------------
+   4. COMPONENTES
+   --------------------------------------------------------------------------- */
+
+.tarjeta {
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  padding: 1.5rem;
+  box-shadow: var(--sombra);
+}
+
+.portada { max-width: 640px; margin-bottom: 1.5rem; }
+.subtitulo { color: var(--tinta-suave); font-size: 1.02rem; margin: 0; }
+
+/* --- Formulario --- */
+.formulario { margin-bottom: 2.5rem; }
+
+/* Grid: tres columnas iguales. minmax(0,1fr) en vez de 1fr a secas evita que
+   un contenido ancho desborde la columna. */
+.campos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.campo label, .campo legend {
+  display: block;
+  font-weight: 600;
+  font-size: .92rem;
+  margin-bottom: .4rem;
+  padding: 0;
+}
+.campo input[type="number"], .campo select {
+  width: 100%;
+  padding: .7rem .8rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--tinta);
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 9px;
+}
+.campo input:focus, .campo select:focus {
+  outline: 2px solid var(--verde);
+  outline-offset: 1px;
+  border-color: var(--verde);
+}
+.campo-con-simbolo { position: relative; }
+.campo-con-simbolo input { padding-right: 2.2rem; }
+.simbolo {
+  position: absolute;
+  right: .8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--tinta-tenue);
+  font-weight: 600;
+}
+.ayuda { font-size: .8rem; color: var(--tinta-tenue); margin: .35rem 0 0; }
+
+.campo-dietas { border: 0; padding: 0; margin: 0 0 1.25rem; }
+.dietas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .7rem;
+}
+.dieta { cursor: pointer; }
+/* El radio se esconde visualmente pero sigue existiendo para el teclado y
+   para los lectores de pantalla. Por eso no se usa display:none. */
+.dieta input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.dieta-cuerpo {
+  display: block;
+  padding: .85rem;
+  border: 2px solid var(--linea);
+  border-radius: 10px;
+  transition: border-color .12s, background .12s;
+}
+.dieta:hover .dieta-cuerpo { border-color: var(--tinta-tenue); }
+/* :checked + .dieta-cuerpo = "el elemento que va justo despues de un radio
+   marcado". Asi la tarjeta se colorea sola al seleccionarla, sin JavaScript. */
+.dieta input:checked + .dieta-cuerpo {
+  border-color: var(--verde);
+  background: var(--verde-claro);
+}
+.dieta input:focus-visible + .dieta-cuerpo { outline: 2px solid var(--verde); outline-offset: 2px; }
+.dieta-nombre { display: block; font-weight: 600; font-size: .92rem; }
+.dieta-cuenta { display: block; font-size: .78rem; color: var(--tinta-tenue); }
+
+.casilla {
+  display: flex;
+  gap: .7rem;
+  align-items: flex-start;
+  padding: .9rem;
+  background: var(--fondo);
+  border-radius: 10px;
+  margin-bottom: 1.4rem;
+  cursor: pointer;
+}
+.casilla input { margin-top: .25rem; width: 17px; height: 17px; accent-color: var(--verde); }
+.casilla small { display: block; color: var(--tinta-suave); font-size: .82rem; }
+
+.boton-principal {
+  width: 100%;
+  padding: .95rem;
+  font-size: 1.02rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: #fff;
+  background: var(--verde);
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.boton-principal:hover { background: var(--verde-oscuro); }
+
+.boton-secundario {
+  display: inline-block;
+  padding: .6rem 1rem;
+  font-size: .9rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--tinta);
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 9px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.boton-secundario:hover { border-color: var(--tinta-tenue); color: var(--tinta); }
+
+/* --- Explicacion de la portada --- */
+.explicacion { margin-top: 2.5rem; }
+.pasos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+.paso h3 { margin: .5rem 0 .3rem; }
+.paso p { font-size: .88rem; color: var(--tinta-suave); margin: 0; }
+.paso-numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  background: var(--verde-claro);
+  color: var(--verde-oscuro);
+  font-weight: 700;
+  font-size: .85rem;
+  border-radius: 50%;
+}
+
+/* --- Resumen y presupuesto --- */
+.resumen { margin-bottom: 2rem; }
+.resumen-cabecera { margin-bottom: 1.1rem; }
+
+.presupuesto {
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-left: 4px solid var(--verde);
+  border-radius: var(--radio);
+  padding: 1.25rem;
+  box-shadow: var(--sombra);
+}
+.presupuesto-excedido { border-left-color: var(--rojo); }
+
+.presupuesto-cifras { display: flex; justify-content: space-between; gap: 1rem; }
+.etiqueta {
+  display: block;
+  font-size: .76rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--tinta-tenue);
+  font-weight: 600;
+}
+.cifra-grande { font-size: 2.1rem; line-height: 1.1; letter-spacing: -.02em; }
+.cifra-media { font-size: 1.35rem; color: var(--tinta-suave); }
+
+.barra {
+  height: 9px;
+  background: var(--fondo);
+  border-radius: 99px;
+  overflow: hidden;
+  margin: .9rem 0 .8rem;
+}
+.barra-relleno { height: 100%; background: var(--verde); border-radius: 99px; }
+.presupuesto-excedido .barra-relleno { background: var(--rojo); }
+
+.aviso { font-size: .89rem; margin: 0; padding: .7rem .85rem; border-radius: 8px; }
+.aviso-ok { background: var(--verde-claro); color: var(--verde-oscuro); }
+.aviso-error { background: var(--rojo-claro); color: var(--rojo); }
+.aviso-atencion { background: var(--ambar-claro); color: var(--ambar); margin-bottom: 1.5rem; }
+.aviso-info { background: var(--fondo); color: var(--tinta-suave); }
+
+/* --- Bloques --- */
+.bloque { margin-bottom: 2.75rem; }
+.bloque-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.bloque-ayuda { color: var(--tinta-suave); font-size: .89rem; margin: 0 0 1.1rem; }
+
+/* --- Tarjetas de receta --- */
+/* auto-fill + minmax hace que quepan tantas columnas como entren, y que las
+   tarjetas se reordenen solas al cambiar el ancho de la ventana. Es la forma
+   moderna de hacer una rejilla responsive sin escribir media queries. */
+.rejilla-recetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 1.1rem;
+}
+.tarjeta-receta {
+  display: block;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: transform .12s, box-shadow .12s;
+}
+.tarjeta-receta:hover { transform: translateY(-2px); box-shadow: var(--sombra); }
+.tarjeta-receta img { width: 100%; aspect-ratio: 600 / 684; object-fit: cover; display: block; background: var(--fondo); }
+.tarjeta-receta-cuerpo { padding: .8rem .9rem 1rem; }
+.tarjeta-receta h3 { font-size: .97rem; margin: 0 0 .25rem; }
+.tarjeta-receta-datos { font-size: .8rem; color: var(--tinta-tenue); margin: 0; }
+
+.insignia {
+  display: inline-block;
+  background: var(--verde-claro);
+  color: var(--verde-oscuro);
+  font-size: .72rem;
+  font-weight: 600;
+  padding: .1rem .45rem;
+  border-radius: 5px;
+  margin-top: .25rem;
+}
+
+/* --- Calendario --- */
+/* overflow-x:auto hace que si la tabla no cabe, se desplace ELLA sola en
+   lugar de estirar la pagina entera y descuadrarlo todo en el movil. */
+.tabla-scroll { overflow-x: auto; }
+.calendario {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  overflow: hidden;
+  font-size: .91rem;
+}
+.calendario th {
+  text-align: left;
+  padding: .7rem .9rem;
+  background: var(--fondo);
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--tinta-tenue);
+}
+.calendario td { padding: .65rem .9rem; border-top: 1px solid var(--linea); }
+.calendario tr.inicio-semana td { border-top: 2px solid var(--tinta-tenue); }
+.celda-semana { font-weight: 700; color: var(--verde); width: 70px; }
+.celda-dia { color: var(--tinta-suave); width: 110px; }
+.calendario a { text-decoration: none; }
+.calendario a:hover { text-decoration: underline; }
+.vacio { color: var(--tinta-tenue); font-style: italic; }
+
+/* --- Lista de la compra --- */
+.seccion-compra { margin-bottom: 1.5rem; }
+.seccion-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: .5rem 0;
+  border-bottom: 2px solid var(--tinta);
+  margin-bottom: .5rem;
+  font-size: .95rem;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+.seccion-total { font-variant-numeric: tabular-nums; }
+.seccion-despensa .seccion-titulo { border-bottom-color: var(--tinta-tenue); color: var(--tinta-suave); }
+.nota-despensa { font-size: .82rem; color: var(--tinta-tenue); margin: 0 0 .5rem; }
+
+.lista-compra { list-style: none; margin: 0; padding: 0; }
+.linea-compra {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  padding: .6rem 0;
+  border-bottom: 1px solid var(--linea);
+}
+.foto-producto {
+  width: 46px; height: 46px;
+  object-fit: contain;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 7px;
+  flex-shrink: 0;
+}
+/* min-width:0 es el arreglo clasico para que un elemento flexible pueda
+   encogerse por debajo de su contenido en vez de desbordar la fila. */
+.linea-texto { flex: 1; min-width: 0; }
+.linea-texto strong { display: block; font-size: .93rem; font-weight: 600; }
+.linea-detalle { display: block; font-size: .8rem; color: var(--tinta-tenue); }
+.linea-necesario { color: var(--tinta-suave); }
+.nota { color: var(--ambar); }
+.linea-numeros { text-align: right; flex-shrink: 0; }
+.unidades {
+  display: block;
+  font-size: .78rem;
+  color: var(--tinta-tenue);
+  text-transform: uppercase;
+}
+.subtotal { font-size: 1rem; font-variant-numeric: tabular-nums; }
+.subtotal-nocuenta { text-decoration: line-through; color: var(--tinta-tenue); font-weight: 500; }
+.total-final small { font-size: .8rem; opacity: .7; font-weight: 400; }
+
+.total-final {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: var(--tinta);
+  color: #fff;
+  border-radius: var(--radio);
+  font-size: 1.05rem;
+}
+.total-final strong { font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+
+/* --- Nutricion --- */
+.nutricion {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: .85rem;
+  margin-bottom: 1rem;
+}
+.macro {
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-left: 3px solid var(--tinta-tenue);
+  border-radius: 10px;
+  padding: .9rem 1rem;
+}
+.macro-valor { display: block; font-size: 1.6rem; font-weight: 700; line-height: 1.15; }
+.macro-nombre { display: block; font-size: .85rem; color: var(--tinta-suave); }
+.macro-referencia { display: block; font-size: .74rem; color: var(--tinta-tenue); margin-top: .2rem; }
+.macro-bien { border-left-color: var(--verde); }
+.macro-bajo { border-left-color: var(--ambar); }
+.macro-alto { border-left-color: var(--ambar); }
+
+/* --- Ficha de receta --- */
+.ficha-cabecera { display: flex; gap: 1.75rem; margin-bottom: 2.25rem; }
+.ficha-imagen {
+  width: 290px;
+  flex-shrink: 0;
+  border-radius: var(--radio);
+  border: 1px solid var(--linea);
+}
+.ficha-datos { flex: 1; min-width: 0; }
+.ficha-etiquetas { margin: 0 0 .75rem; display: flex; gap: .35rem; flex-wrap: wrap; }
+.ficha-cifras {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: .9rem 0;
+  margin: 0 0 .75rem;
+  border-top: 1px solid var(--linea);
+  border-bottom: 1px solid var(--linea);
+}
+.ficha-cifras li { font-size: .85rem; color: var(--tinta-suave); }
+.ficha-cifras strong { display: block; font-size: 1.25rem; color: var(--tinta); }
+
+.ficha-columnas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 2.25rem;
+  margin-bottom: 2.5rem;
+}
+.lista-ingredientes { list-style: none; margin: 0; padding: 0; }
+.lista-ingredientes li {
+  display: flex;
+  gap: .75rem;
+  padding: .45rem 0;
+  border-bottom: 1px solid var(--linea);
+  font-size: .92rem;
+}
+.ingrediente-cantidad {
+  width: 78px;
+  flex-shrink: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--verde-oscuro);
+}
+.lista-pasos { margin: 0; padding-left: 1.25rem; }
+.lista-pasos li { margin-bottom: .6rem; font-size: .93rem; }
+
+.volver { margin-top: 2rem; }
+
+/* --- Pagina de error --- */
+.panel-error { border-left: 4px solid var(--ambar); max-width: 640px; }
+.mensaje-error {
+  background: var(--fondo);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: .9rem;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: .85rem;
+  white-space: pre-wrap;   /* respeta los saltos de linea pero permite ajustar */
+  margin-bottom: 1.5rem;
+}
+
+/* ---------------------------------------------------------------------------
+   5. MOVIL
+   Una "media query" aplica reglas solo cuando se cumple una condicion. Aqui,
+   cuando la pantalla mide 760 pixeles o menos: las rejillas de varias columnas
+   pasan a una sola.
+   --------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  h1 { font-size: 1.5rem; }
+  .campos { grid-template-columns: 1fr; }
+  .dietas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pasos { grid-template-columns: 1fr; }
+  .ficha-cabecera { flex-direction: column; }
+  .ficha-imagen { width: 100%; }
+  .ficha-columnas { grid-template-columns: 1fr; gap: 1.75rem; }
+  .cifra-grande { font-size: 1.7rem; }
+  .bloque-cabecera { flex-direction: column; align-items: flex-start; }
+}
+
+/* ---------------------------------------------------------------------------
+   6. IMPRESION
+   Se aplica solo al imprimir o al guardar como PDF. La idea es dejar en el
+   papel unicamente la lista de la compra, que es lo unico que te llevas al
+   supermercado: nada de botones, ni menu, ni fotos de recetas.
+   --------------------------------------------------------------------------- */
+@media print {
+  .cabecera, .pie, .boton-secundario, .boton-principal,
+  .rejilla-recetas, .explicacion, .volver, .nutricion, .aviso-info {
+    display: none !important;
+  }
+  body { background: #fff; font-size: 11pt; }
+  .contenedor { max-width: 100%; padding: 0; }
+  .tarjeta, .presupuesto, .calendario { box-shadow: none; border: 1px solid #ccc; }
+  .total-final { background: #fff; color: #000; border: 2px solid #000; }
+  /* Evita que una seccion de la compra se parta entre dos hojas. */
+  .seccion-compra, .linea-compra { break-inside: avoid; }
+  a { color: #000; text-decoration: none; }
+}

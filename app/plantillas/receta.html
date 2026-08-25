@@ -1,0 +1,123 @@
+{# La ficha de una receta. #}
+{% extends "base.html" %}
+
+{% block titulo %}{{ receta.nombre }}{% endblock %}
+
+{% block contenido %}
+
+<article class="ficha">
+
+  <div class="ficha-cabecera">
+    <img class="ficha-imagen"
+         src="{{ url_for('imagen_receta', id_receta=receta.id) }}"
+         alt="{{ receta.nombre }}">
+    <div class="ficha-datos">
+      <h1>{{ receta.nombre }}</h1>
+      <p class="ficha-etiquetas">
+        {% for dieta in receta.dietas %}
+          <span class="insignia">{{ nombres_dietas[dieta] }}</span>
+        {% endfor %}
+      </p>
+      <ul class="ficha-cifras">
+        <li><strong>{{ receta.raciones }}</strong> raciones</li>
+        <li><strong>{{ receta.minutos }}</strong> minutos</li>
+        <li><strong>{{ macros.kcal | round | int }}</strong> kcal por ración</li>
+        <li><strong>{{ (coste / receta.raciones) | euros }}</strong> por ración</li>
+      </ul>
+      <p class="letra-pequena">
+        Coste de cocinarla entera comprando todo de cero:
+        <strong>{{ coste | euros }}</strong>. Dentro de un plan sale más barata,
+        porque comparte ingredientes con las demás recetas.
+      </p>
+    </div>
+  </div>
+
+  <div class="ficha-columnas">
+
+    <section>
+      <h2>Ingredientes</h2>
+      <p class="bloque-ayuda">Cantidades para {{ receta.raciones }} raciones.</p>
+      <ul class="lista-ingredientes">
+        {% for item in receta.ingredientes %}
+          {% set ingrediente = ingredientes[item.id] %}
+          <li>
+            <span class="ingrediente-cantidad">{{ item.gramos | gramos }}</span>
+            <span class="ingrediente-nombre">{{ ingrediente.nombre }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section>
+      <h2>Preparación</h2>
+      <ol class="lista-pasos">
+        {% for paso in receta.pasos %}
+          <li>{{ paso }}</li>
+        {% endfor %}
+      </ol>
+    </section>
+
+  </div>
+
+  <section class="bloque">
+    <h2>Qué comprarías en Mercadona</h2>
+    <p class="bloque-ayuda">
+      Los productos concretos y las unidades que harían falta para cocinar solo
+      esta receta.
+    </p>
+    <ul class="lista-compra">
+      {% for linea in lineas %}
+        <li class="linea-compra">
+          {% if linea.sin_producto %}
+            <div class="linea-texto">
+              <strong>{{ linea.ingrediente.nombre }}</strong>
+              <span class="linea-detalle">sin producto encontrado</span>
+            </div>
+          {% else %}
+            <img class="foto-producto" src="{{ linea.producto.url_imagen }}" alt="" loading="lazy">
+            <div class="linea-texto">
+              <strong>{{ linea.producto.nombre }}</strong>
+              <span class="linea-detalle">
+                {{ linea.producto.precio | euros }} el envase ·
+                necesitas {{ linea.gramos_necesarios | gramos }}
+              </span>
+            </div>
+            <div class="linea-numeros">
+              <span class="unidades">{{ linea.unidades }} ud</span>
+              <strong class="subtotal">{{ linea.coste | euros }}</strong>
+            </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="bloque">
+    <h2>Por ración</h2>
+    <div class="nutricion">
+      <div class="macro">
+        <span class="macro-valor">{{ macros.kcal | round | int }}</span>
+        <span class="macro-nombre">kcal</span>
+      </div>
+      <div class="macro">
+        <span class="macro-valor">{{ macros.proteina | round | int }} g</span>
+        <span class="macro-nombre">proteína</span>
+      </div>
+      <div class="macro">
+        <span class="macro-valor">{{ macros.hidratos | round | int }} g</span>
+        <span class="macro-nombre">hidratos</span>
+      </div>
+      <div class="macro">
+        <span class="macro-valor">{{ macros.grasa | round | int }} g</span>
+        <span class="macro-nombre">grasas</span>
+      </div>
+    </div>
+  </section>
+
+</article>
+
+<p class="volver">
+  <a class="boton-secundario" href="{{ url_for('inicio') }}">← Volver al inicio</a>
+</p>
+
+{% endblock %}

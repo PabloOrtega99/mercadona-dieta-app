@@ -1,0 +1,130 @@
+{# La pagina de entrada: el formulario. Hereda el esqueleto de base.html. #}
+{% extends "base.html" %}
+
+{% block titulo %}Generar menú y lista de la compra{% endblock %}
+
+{% block contenido %}
+
+<section class="portada">
+  <h1>¿Cuánto quieres gastar y para cuánto tiempo?</h1>
+  <p class="subtitulo">
+    Te propongo un menú de comidas y cenas y te preparo la lista de la compra
+    de Mercadona, con productos y precios reales.
+  </p>
+</section>
+
+{# method="post" envia los datos sin que aparezcan en la direccion.
+   action dice a que ruta de web.py se envian: la funcion generar(). #}
+<form class="tarjeta formulario" method="post" action="{{ url_for('generar') }}">
+
+  <div class="campos">
+
+    <div class="campo">
+      <label for="presupuesto">Presupuesto</label>
+      {# type="number" hace que el movil saque el teclado numerico y que el
+         navegador ya valide los limites antes de enviar nada. #}
+      <div class="campo-con-simbolo">
+        <input type="number" id="presupuesto" name="presupuesto"
+               value="80" min="20" max="2000" step="5" required>
+        <span class="simbolo">€</span>
+      </div>
+      <p class="ayuda">Lo que quieres gastarte en total.</p>
+    </div>
+
+    <div class="campo">
+      <label for="semanas">¿Para cuánto tiempo?</label>
+      <select id="semanas" name="semanas">
+        <option value="1">1 semana</option>
+        <option value="2" selected>2 semanas</option>
+        <option value="3">3 semanas</option>
+        <option value="4">4 semanas</option>
+      </select>
+      <p class="ayuda">Se planifican comida y cena: 14 comidas por semana.</p>
+    </div>
+
+    <div class="campo">
+      <label for="personas">¿Para cuántas personas?</label>
+      <select id="personas" name="personas">
+        {% for n in range(1, 7) %}
+          <option value="{{ n }}">{{ n }} persona{{ 's' if n > 1 }}</option>
+        {% endfor %}
+      </select>
+      <p class="ayuda">Ajusta las cantidades de la compra.</p>
+    </div>
+
+  </div>
+
+  <fieldset class="campo campo-dietas">
+    <legend>Tipo de dieta</legend>
+    <div class="dietas">
+      {% for dieta in dietas %}
+        {# El truco de las tarjetas seleccionables: un radio invisible dentro
+           de una etiqueta <label>. Pulsar la tarjeta marca el radio, y el CSS
+           colorea la tarjeta segun este marcado o no. #}
+        <label class="dieta">
+          <input type="radio" name="dieta" value="{{ dieta }}"
+                 {{ 'checked' if loop.first }}>
+          <span class="dieta-cuerpo">
+            <span class="dieta-nombre">{{ nombres_dietas[dieta] }}</span>
+            <span class="dieta-cuenta">{{ recetas_por_dieta[dieta] }} recetas</span>
+          </span>
+        </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  <label class="casilla">
+    <input type="checkbox" name="desayunos" checked>
+    <span>
+      <strong>Incluir los básicos del desayuno</strong>
+      <small>Leche, café, pan de molde, avena, yogur y fruta. Se suman a la
+      cesta y al presupuesto para que las cuentas cuadren con la realidad.</small>
+    </span>
+  </label>
+
+  <label class="casilla">
+    <input type="checkbox" name="despensa">
+    <span>
+      <strong>Ya tengo la despensa básica en casa</strong>
+      <small>Aceite, sal, especias, vinagre, harina... Duran meses, así que si
+      ya los tienes no tiene sentido cargarlos a esta compra. Seguirán
+      apareciendo en la lista, en un apartado aparte y sin sumar al total.</small>
+    </span>
+  </label>
+
+  <button type="submit" class="boton-principal">Generar mi menú y mi lista</button>
+
+</form>
+
+<section class="explicacion">
+  <h2>Cómo se calcula</h2>
+  <div class="pasos">
+    <div class="paso">
+      <span class="paso-numero">1</span>
+      <h3>Precios reales</h3>
+      <p>
+        El catálogo se descarga de la API de Mercadona: {{ datos.total_productos }}
+        productos con su precio, su envase y su foto.
+      </p>
+    </div>
+    <div class="paso">
+      <span class="paso-numero">2</span>
+      <h3>Envases, no gramos</h3>
+      <p>
+        Si una receta lleva 50 g de aceite, tú pagas la botella entera. Y esa
+        botella vale para las demás recetas. El cálculo cuenta envases, que es
+        lo que pagas de verdad.
+      </p>
+    </div>
+    <div class="paso">
+      <span class="paso-numero">3</span>
+      <h3>El menú más variado que quepa</h3>
+      <p>
+        Se eligen recetas que compartan ingredientes (sale más barato) y luego
+        se gasta lo que sobra en variedad y en que las comidas alimenten.
+      </p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

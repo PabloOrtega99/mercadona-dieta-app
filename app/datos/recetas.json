@@ -1,0 +1,259 @@
+{
+  "_ayuda": {
+    "que_es": "El recetario. Cada receta dice que ingredientes lleva y en que cantidad, para poder calcular a la vez su coste real en Mercadona y su aporte nutricional.",
+    "campos": {
+      "id": "Nombre corto sin espacios ni tildes. Debe ser unico.",
+      "nombre": "Como se muestra en pantalla.",
+      "dietas": "Para que dietas vale esta receta. Valores posibles: equilibrada, proteina, vegetariana, vegana. IMPORTANTE: pon 'equilibrada' en TODAS (la dieta equilibrada no restringe nada), y si una receta es vegana pon tambien 'vegetariana' (toda receta vegana lo es).",
+      "raciones": "Cuantos platos salen. Casi todas son de 4 porque se cocina la cazuela entera, no media.",
+      "minutos": "Tiempo aproximado de preparacion.",
+      "ingredientes": "Lista de { id, gramos }. El 'id' tiene que existir en ingredientes.json. Los gramos son para el TOTAL de la receta, no por racion.",
+      "pasos": "Como se cocina, en frases cortas."
+    },
+    "como_anadir_una": "Copia un bloque, cambialo y guarda el archivo. Despues ejecuta 'python scripts/comprobar_datos.py' para que te avise si te has equivocado en algun id o etiqueta."
+  },
+
+  "recetas": [
+
+    { "id": "pollo_horno_patatas", "nombre": "Pollo al horno con patatas", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 55,
+      "ingredientes": [{"id": "pechuga_pollo", "gramos": 600}, {"id": "patata", "gramos": 800}, {"id": "cebolla", "gramos": 150}, {"id": "ajo", "gramos": 15}, {"id": "limon", "gramos": 100}, {"id": "aceite_oliva", "gramos": 30}, {"id": "sal", "gramos": 5}, {"id": "pimienta", "gramos": 1}],
+      "pasos": ["Precalienta el horno a 200 grados.", "Corta las patatas en rodajas finas y la cebolla en juliana. Extiendelas en la bandeja con aceite, sal y pimienta.", "Coloca encima el pollo salpimentado, el ajo picado y el zumo de limon.", "Hornea 40 minutos, dandole la vuelta al pollo a mitad."] },
+
+    { "id": "arroz_con_pollo", "nombre": "Arroz con pollo", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 45,
+      "ingredientes": [{"id": "pechuga_pollo", "gramos": 500}, {"id": "arroz", "gramos": 320}, {"id": "pimiento_rojo", "gramos": 150}, {"id": "pimiento_verde", "gramos": 150}, {"id": "cebolla", "gramos": 120}, {"id": "tomate_triturado", "gramos": 200}, {"id": "caldo_pollo", "gramos": 800}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 30}, {"id": "pimenton", "gramos": 3}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Dora el pollo troceado en la cazuela con aceite y reservalo.", "Sofrie cebolla, pimientos y ajo. Anade el pimenton y el tomate y cocina 5 minutos.", "Incorpora el arroz, remueve y vuelca el caldo caliente junto con el pollo.", "Cuece 18 minutos a fuego medio y deja reposar 5 minutos tapado."] },
+
+    { "id": "pollo_al_curry", "nombre": "Pollo al curry con arroz", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 35,
+      "ingredientes": [{"id": "pechuga_pollo", "gramos": 600}, {"id": "leche_coco", "gramos": 400}, {"id": "cebolla", "gramos": 150}, {"id": "arroz", "gramos": 300}, {"id": "ajo", "gramos": 10}, {"id": "curry", "gramos": 10}, {"id": "aceite_oliva", "gramos": 20}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Cuece el arroz en agua con sal.", "Pocha la cebolla y el ajo, anade el pollo en dados y dorala.", "Incorpora el curry, remueve un minuto y vierte la leche de coco.", "Cocina 12 minutos a fuego suave hasta que espese. Sirve sobre el arroz."] },
+
+    { "id": "pavo_plancha_verduras", "nombre": "Pavo a la plancha con verduras", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 25,
+      "ingredientes": [{"id": "pechuga_pavo", "gramos": 600}, {"id": "calabacin", "gramos": 300}, {"id": "pimiento_rojo", "gramos": 200}, {"id": "cebolla", "gramos": 100}, {"id": "aceite_oliva", "gramos": 25}, {"id": "sal", "gramos": 4}, {"id": "pimienta", "gramos": 1}],
+      "pasos": ["Corta las verduras en tiras y saltealas en la sarten con aceite y sal, 10 minutos.", "Retiralas y en la misma sarten haz los filetes de pavo salpimentados, 3 minutos por lado.", "Sirve el pavo sobre las verduras."] },
+
+    { "id": "albondigas_tomate", "nombre": "Albondigas en salsa de tomate", "dietas": ["equilibrada"], "raciones": 4, "minutos": 50,
+      "ingredientes": [{"id": "carne_picada_mixta", "gramos": 600}, {"id": "huevo", "gramos": 60}, {"id": "pan_rallado", "gramos": 60}, {"id": "tomate_triturado", "gramos": 500}, {"id": "cebolla", "gramos": 120}, {"id": "arroz", "gramos": 250}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 30}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Mezcla la carne con el huevo, el pan rallado, ajo picado y sal. Forma bolas.", "Dora las albondigas en la sarten y resérvalas.", "Sofrie la cebolla, anade el tomate y cocina 10 minutos.", "Devuelve las albondigas a la salsa y cocina 15 minutos. Sirve con el arroz cocido."] },
+
+    { "id": "espaguetis_bolonesa", "nombre": "Espaguetis a la bolonesa", "dietas": ["equilibrada"], "raciones": 4, "minutos": 40,
+      "ingredientes": [{"id": "espaguetis", "gramos": 350}, {"id": "carne_picada_ternera", "gramos": 400}, {"id": "tomate_triturado", "gramos": 500}, {"id": "cebolla", "gramos": 150}, {"id": "zanahoria", "gramos": 120}, {"id": "queso_rallado", "gramos": 60}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 25}, {"id": "oregano", "gramos": 2}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Pica cebolla, zanahoria y ajo muy fino y pochalos 10 minutos.", "Anade la carne picada y dorala bien.", "Incorpora el tomate y el oregano y cocina 20 minutos a fuego lento.", "Cuece la pasta, mezclala con la salsa y espolvorea el queso."] },
+
+    { "id": "lasana_carne", "nombre": "Lasana de carne", "dietas": ["equilibrada"], "raciones": 4, "minutos": 70,
+      "ingredientes": [{"id": "placas_lasana", "gramos": 250}, {"id": "carne_picada_mixta", "gramos": 500}, {"id": "tomate_triturado", "gramos": 400}, {"id": "cebolla", "gramos": 150}, {"id": "leche", "gramos": 400}, {"id": "harina", "gramos": 40}, {"id": "mantequilla", "gramos": 40}, {"id": "queso_rallado", "gramos": 120}, {"id": "aceite_oliva", "gramos": 20}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Haz la bolonesa: pocha la cebolla, dora la carne y anade el tomate. Cocina 20 minutos.", "Prepara la bechamel fundiendo la mantequilla, anadiendo la harina y la leche poco a poco.", "Monta capas de placas, carne y bechamel en una fuente.", "Cubre con queso rallado y hornea 25 minutos a 190 grados."] },
+
+    { "id": "lomo_pimientos", "nombre": "Lomo con pimientos y patatas", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 35,
+      "ingredientes": [{"id": "lomo_cerdo", "gramos": 600}, {"id": "pimiento_verde", "gramos": 400}, {"id": "patata", "gramos": 600}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 35}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Corta las patatas en dados y hazlas en la sarten a fuego medio, 20 minutos.", "Frie los pimientos en tiras con el ajo laminado.", "Haz el lomo a la plancha, 3 minutos por lado, y sirvelo todo junto."] },
+
+    { "id": "ternera_guisada", "nombre": "Ternera guisada con patatas", "dietas": ["equilibrada"], "raciones": 4, "minutos": 90,
+      "ingredientes": [{"id": "filete_ternera", "gramos": 600}, {"id": "patata", "gramos": 700}, {"id": "zanahoria", "gramos": 200}, {"id": "cebolla", "gramos": 150}, {"id": "caldo_pollo", "gramos": 500}, {"id": "vino_blanco", "gramos": 100}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 30}, {"id": "laurel", "gramos": 1}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Dora la carne en dados en la olla y resérvala.", "Pocha cebolla, ajo y zanahoria. Vuelve a meter la carne y anade el vino.", "Cubre con el caldo, echa el laurel y cuece 50 minutos tapado.", "Anade las patatas en trozos y cuece 25 minutos mas."] },
+
+    { "id": "pollo_asado_arroz", "nombre": "Contramuslos asados con arroz", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 60,
+      "ingredientes": [{"id": "muslo_pollo", "gramos": 800}, {"id": "arroz", "gramos": 300}, {"id": "cebolla", "gramos": 150}, {"id": "limon", "gramos": 100}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 25}, {"id": "pimenton", "gramos": 4}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Adoba el pollo con ajo picado, pimenton, sal, aceite y zumo de limon. Deja 15 minutos.", "Hornea a 200 grados sobre la cebolla en juliana, 45 minutos.", "Sirve con el arroz blanco cocido."] },
+
+    { "id": "fajitas_pollo", "nombre": "Fajitas de pollo", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 30,
+      "ingredientes": [{"id": "pechuga_pollo", "gramos": 500}, {"id": "tortilla_trigo", "gramos": 320}, {"id": "pimiento_rojo", "gramos": 200}, {"id": "pimiento_verde", "gramos": 200}, {"id": "cebolla", "gramos": 150}, {"id": "aceite_oliva", "gramos": 20}, {"id": "comino", "gramos": 3}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Corta el pollo en tiras y saltealo con sal y comino.", "Anade los pimientos y la cebolla en tiras y saltea 8 minutos mas.", "Calienta las tortillas y rellenalas."] },
+
+    { "id": "hamburguesa_casera", "nombre": "Hamburguesa casera", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 25,
+      "ingredientes": [{"id": "carne_picada_ternera", "gramos": 600}, {"id": "pan", "gramos": 320}, {"id": "tomate", "gramos": 200}, {"id": "lechuga", "gramos": 100}, {"id": "cebolla", "gramos": 100}, {"id": "mostaza", "gramos": 20}, {"id": "aceite_oliva", "gramos": 20}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Forma 4 hamburguesas con la carne y sal.", "Hazlas a la plancha 4 minutos por lado.", "Monta con el pan, la lechuga, el tomate en rodajas, la cebolla y la mostaza."] },
+
+    { "id": "pollo_almendras", "nombre": "Pollo en salsa de almendras", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 45,
+      "ingredientes": [{"id": "pechuga_pollo", "gramos": 600}, {"id": "almendras", "gramos": 80}, {"id": "cebolla", "gramos": 150}, {"id": "caldo_pollo", "gramos": 300}, {"id": "vino_blanco", "gramos": 100}, {"id": "arroz", "gramos": 250}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 25}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Dora el pollo en trozos y resérvalo.", "Pocha la cebolla y el ajo. Anade el vino y deja evaporar.", "Tritura las almendras con el caldo y anadelo a la cazuela con el pollo.", "Cuece 20 minutos a fuego suave. Sirve con arroz."] },
+
+    { "id": "arroz_tres_delicias", "nombre": "Arroz tres delicias", "dietas": ["equilibrada"], "raciones": 4, "minutos": 30,
+      "ingredientes": [{"id": "arroz", "gramos": 320}, {"id": "huevo", "gramos": 120}, {"id": "jamon_cocido", "gramos": 150}, {"id": "guisantes", "gramos": 200}, {"id": "zanahoria", "gramos": 150}, {"id": "salsa_soja", "gramos": 30}, {"id": "aceite_oliva", "gramos": 20}],
+      "pasos": ["Cuece el arroz y escurrelo bien.", "Haz una tortilla fina con los huevos y cortala en tiras.", "Saltea la zanahoria en dados y los guisantes. Anade el jamon y el arroz.", "Incorpora la tortilla y la salsa de soja y saltea 2 minutos."] },
+
+    { "id": "macarrones_chorizo", "nombre": "Macarrones con chorizo", "dietas": ["equilibrada"], "raciones": 4, "minutos": 30,
+      "ingredientes": [{"id": "macarrones", "gramos": 350}, {"id": "chorizo", "gramos": 200}, {"id": "tomate_triturado", "gramos": 400}, {"id": "cebolla", "gramos": 120}, {"id": "queso_rallado", "gramos": 60}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 20}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Cuece los macarrones.", "Sofrie la cebolla y el ajo, anade el chorizo en rodajas y dorálo.", "Incorpora el tomate y cocina 12 minutos.", "Mezcla con la pasta y gratina con el queso."] },
+
+    { "id": "merluza_horno", "nombre": "Merluza al horno con patatas", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 45,
+      "ingredientes": [{"id": "merluza", "gramos": 600}, {"id": "patata", "gramos": 700}, {"id": "cebolla", "gramos": 150}, {"id": "limon", "gramos": 100}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 30}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Extiende las patatas en rodajas finas y la cebolla en la bandeja, con aceite y sal.", "Hornea 25 minutos a 200 grados.", "Coloca la merluza encima con ajo picado y limon y hornea 15 minutos mas."] },
+
+    { "id": "salmon_brocoli", "nombre": "Salmon a la plancha con brocoli", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 25,
+      "ingredientes": [{"id": "salmon", "gramos": 600}, {"id": "brocoli", "gramos": 500}, {"id": "patata", "gramos": 400}, {"id": "limon", "gramos": 80}, {"id": "aceite_oliva", "gramos": 25}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Cuece el brocoli en ramilletes y las patatas 15 minutos.", "Haz el salmon a la plancha 4 minutos por lado, empezando por la piel.", "Alina las verduras con aceite, sal y limon."] },
+
+    { "id": "bacalao_tomate", "nombre": "Bacalao con tomate", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 40,
+      "ingredientes": [{"id": "bacalao", "gramos": 600}, {"id": "tomate_triturado", "gramos": 500}, {"id": "cebolla", "gramos": 150}, {"id": "pimiento_rojo", "gramos": 150}, {"id": "patata", "gramos": 500}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 30}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Pocha la cebolla, el pimiento y el ajo.", "Anade el tomate y cocina 15 minutos.", "Coloca los lomos de bacalao sobre la salsa y cocina 10 minutos tapado.", "Acompana con las patatas cocidas."] },
+
+    { "id": "arroz_gambas", "nombre": "Arroz con gambas y verduras", "dietas": ["equilibrada"], "raciones": 4, "minutos": 40,
+      "ingredientes": [{"id": "arroz", "gramos": 320}, {"id": "gambas", "gramos": 300}, {"id": "pimiento_rojo", "gramos": 150}, {"id": "guisantes", "gramos": 150}, {"id": "cebolla", "gramos": 120}, {"id": "caldo_pollo", "gramos": 800}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 25}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Saltea las gambas 1 minuto y resérvalas.", "Sofrie cebolla, ajo y pimiento. Anade el arroz y remueve.", "Vierte el caldo caliente y cuece 15 minutos.", "Anade los guisantes y las gambas los ultimos 3 minutos."] },
+
+    { "id": "ensalada_atun", "nombre": "Ensalada completa de atun", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 20,
+      "ingredientes": [{"id": "atun_lata", "gramos": 240}, {"id": "lechuga", "gramos": 300}, {"id": "tomate", "gramos": 400}, {"id": "maiz_dulce", "gramos": 200}, {"id": "huevo", "gramos": 180}, {"id": "aceitunas", "gramos": 80}, {"id": "cebolla", "gramos": 80}, {"id": "aceite_oliva", "gramos": 30}, {"id": "vinagre", "gramos": 15}, {"id": "sal", "gramos": 3}],
+      "pasos": ["Cuece los huevos 10 minutos y pelalos.", "Trocea la lechuga, el tomate y la cebolla.", "Monta con el atun escurrido, el maiz, las aceitunas y el huevo en cuartos.", "Alina con aceite, vinagre y sal."] },
+
+    { "id": "dorada_horno", "nombre": "Dorada al horno", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 45,
+      "ingredientes": [{"id": "dorada", "gramos": 800}, {"id": "patata", "gramos": 600}, {"id": "cebolla", "gramos": 150}, {"id": "limon", "gramos": 100}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 30}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Asa las patatas en rodajas con la cebolla 25 minutos a 200 grados.", "Coloca la dorada encima, con limon en rodajas y ajo.", "Hornea 18 minutos mas."] },
+
+    { "id": "calamares_cebolla", "nombre": "Calamares encebollados", "dietas": ["equilibrada"], "raciones": 4, "minutos": 40,
+      "ingredientes": [{"id": "calamar", "gramos": 600}, {"id": "cebolla", "gramos": 400}, {"id": "vino_blanco", "gramos": 100}, {"id": "arroz", "gramos": 250}, {"id": "ajo", "gramos": 15}, {"id": "aceite_oliva", "gramos": 30}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Pocha la cebolla en juliana a fuego lento 20 minutos, hasta que este dorada.", "Anade el ajo y los calamares en anillas.", "Vierte el vino y cocina 12 minutos. Sirve con arroz blanco."] },
+
+    { "id": "pasta_atun", "nombre": "Pasta con atun y tomate", "dietas": ["equilibrada"], "raciones": 4, "minutos": 25,
+      "ingredientes": [{"id": "espaguetis", "gramos": 350}, {"id": "atun_lata", "gramos": 240}, {"id": "tomate_frito", "gramos": 400}, {"id": "cebolla", "gramos": 120}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 20}, {"id": "oregano", "gramos": 2}],
+      "pasos": ["Cuece la pasta.", "Pocha la cebolla y el ajo, anade el tomate frito y el oregano.", "Incorpora el atun escurrido y mezcla con la pasta."] },
+
+    { "id": "mejillones_marinera", "nombre": "Mejillones a la marinera", "dietas": ["equilibrada"], "raciones": 4, "minutos": 30,
+      "ingredientes": [{"id": "mejillones", "gramos": 1000}, {"id": "tomate_triturado", "gramos": 300}, {"id": "cebolla", "gramos": 150}, {"id": "vino_blanco", "gramos": 150}, {"id": "pan", "gramos": 200}, {"id": "ajo", "gramos": 15}, {"id": "aceite_oliva", "gramos": 25}, {"id": "pimenton", "gramos": 3}],
+      "pasos": ["Limpia los mejillones.", "Sofrie cebolla y ajo, anade el pimenton y el tomate.", "Vierte el vino, anade los mejillones y tapa 6 minutos hasta que se abran.", "Sirve con pan para mojar."] },
+
+    { "id": "merluza_rebozada", "nombre": "Merluza rebozada con ensalada", "dietas": ["equilibrada"], "raciones": 4, "minutos": 30,
+      "ingredientes": [{"id": "merluza", "gramos": 600}, {"id": "huevo", "gramos": 120}, {"id": "harina", "gramos": 80}, {"id": "lechuga", "gramos": 200}, {"id": "tomate", "gramos": 300}, {"id": "limon", "gramos": 60}, {"id": "aceite_oliva", "gramos": 60}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Sala la merluza, pasala por harina y huevo batido.", "Friela en aceite caliente 3 minutos por lado.", "Sirve con la ensalada de lechuga y tomate alinada."] },
+
+    { "id": "lentejas_chorizo", "nombre": "Lentejas estofadas con chorizo", "dietas": ["equilibrada"], "raciones": 4, "minutos": 60,
+      "ingredientes": [{"id": "lentejas", "gramos": 350}, {"id": "chorizo", "gramos": 150}, {"id": "zanahoria", "gramos": 200}, {"id": "cebolla", "gramos": 150}, {"id": "patata", "gramos": 300}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 25}, {"id": "pimenton", "gramos": 5}, {"id": "laurel", "gramos": 1}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Sofrie cebolla, ajo y zanahoria en la olla.", "Anade el chorizo en rodajas y el pimenton, remueve rapido para que no se queme.", "Incorpora las lentejas, la patata en trozos, el laurel y agua hasta cubrir dos dedos.", "Cuece 45 minutos a fuego lento."] },
+
+    { "id": "lentejas_verduras", "nombre": "Lentejas con verduras", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 55,
+      "ingredientes": [{"id": "lentejas", "gramos": 350}, {"id": "zanahoria", "gramos": 200}, {"id": "cebolla", "gramos": 150}, {"id": "patata", "gramos": 300}, {"id": "pimiento_rojo", "gramos": 120}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 30}, {"id": "pimenton", "gramos": 5}, {"id": "laurel", "gramos": 1}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Sofrie cebolla, ajo, zanahoria y pimiento 10 minutos.", "Anade el pimenton y remueve fuera del fuego.", "Incorpora las lentejas, la patata, el laurel y agua hasta cubrir.", "Cuece 45 minutos a fuego lento."] },
+
+    { "id": "garbanzos_espinacas", "nombre": "Garbanzos con espinacas", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 40,
+      "ingredientes": [{"id": "garbanzos_cocidos", "gramos": 800}, {"id": "espinacas", "gramos": 400}, {"id": "pan", "gramos": 60}, {"id": "ajo", "gramos": 15}, {"id": "aceite_oliva", "gramos": 30}, {"id": "pimenton", "gramos": 4}, {"id": "comino", "gramos": 3}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Frie el pan y el ajo en aceite y tritúralos con un poco de agua.", "Saltea las espinacas hasta que reduzcan.", "Anade los garbanzos escurridos, el pimenton, el comino y la majada de pan.", "Cocina 10 minutos removiendo."] },
+
+    { "id": "potaje_bacalao", "nombre": "Potaje de garbanzos con bacalao", "dietas": ["equilibrada"], "raciones": 4, "minutos": 50,
+      "ingredientes": [{"id": "garbanzos_cocidos", "gramos": 700}, {"id": "bacalao", "gramos": 300}, {"id": "espinacas", "gramos": 300}, {"id": "huevo", "gramos": 120}, {"id": "cebolla", "gramos": 120}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 25}, {"id": "pimenton", "gramos": 4}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Cuece los huevos y resérvalos.", "Sofrie cebolla y ajo, anade el pimenton y un vaso de agua.", "Incorpora los garbanzos, las espinacas y el bacalao desmigado. Cuece 15 minutos.", "Sirve con el huevo cocido en cuartos."] },
+
+    { "id": "alubias_verduras", "nombre": "Alubias con verduras", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 35,
+      "ingredientes": [{"id": "alubias_cocidas", "gramos": 800}, {"id": "calabacin", "gramos": 250}, {"id": "zanahoria", "gramos": 200}, {"id": "cebolla", "gramos": 150}, {"id": "tomate_triturado", "gramos": 300}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 30}, {"id": "pimenton", "gramos": 4}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Pocha cebolla, ajo, zanahoria y calabacin en dados, 12 minutos.", "Anade el pimenton y el tomate y cocina 10 minutos.", "Incorpora las alubias escurridas y cocina 8 minutos mas."] },
+
+    { "id": "curry_garbanzos", "nombre": "Curry de garbanzos y espinacas", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 35,
+      "ingredientes": [{"id": "garbanzos_cocidos", "gramos": 800}, {"id": "espinacas", "gramos": 300}, {"id": "leche_coco", "gramos": 400}, {"id": "cebolla", "gramos": 150}, {"id": "arroz", "gramos": 300}, {"id": "ajo", "gramos": 10}, {"id": "curry", "gramos": 12}, {"id": "aceite_oliva", "gramos": 20}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Cuece el arroz.", "Pocha la cebolla y el ajo, anade el curry y remueve un minuto.", "Vierte la leche de coco y los garbanzos. Cocina 12 minutos.", "Anade las espinacas al final hasta que reduzcan."] },
+
+    { "id": "ensalada_lentejas", "nombre": "Ensalada de lentejas", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 15,
+      "ingredientes": [{"id": "lentejas_cocidas", "gramos": 800}, {"id": "tomate", "gramos": 300}, {"id": "pepino", "gramos": 200}, {"id": "cebolla", "gramos": 100}, {"id": "maiz_dulce", "gramos": 150}, {"id": "aceite_oliva", "gramos": 30}, {"id": "vinagre", "gramos": 20}, {"id": "sal", "gramos": 3}],
+      "pasos": ["Enjuaga y escurre bien las lentejas.", "Corta el tomate, el pepino y la cebolla en dados pequenos.", "Mezcla todo con el maiz y alina con aceite, vinagre y sal."] },
+
+    { "id": "chili_alubias", "nombre": "Chili de alubias", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 40,
+      "ingredientes": [{"id": "alubias_cocidas", "gramos": 800}, {"id": "tomate_triturado", "gramos": 400}, {"id": "pimiento_rojo", "gramos": 200}, {"id": "cebolla", "gramos": 150}, {"id": "maiz_dulce", "gramos": 200}, {"id": "arroz", "gramos": 250}, {"id": "ajo", "gramos": 10}, {"id": "comino", "gramos": 5}, {"id": "pimenton", "gramos": 4}, {"id": "aceite_oliva", "gramos": 25}],
+      "pasos": ["Pocha cebolla, ajo y pimiento en dados.", "Anade el comino y el pimenton, luego el tomate. Cocina 10 minutos.", "Incorpora las alubias y el maiz y cocina 15 minutos a fuego lento.", "Sirve con el arroz blanco."] },
+
+    { "id": "tortilla_patatas", "nombre": "Tortilla de patatas", "dietas": ["equilibrada", "vegetariana"], "raciones": 4, "minutos": 40,
+      "ingredientes": [{"id": "patata", "gramos": 800}, {"id": "huevo", "gramos": 360}, {"id": "cebolla", "gramos": 200}, {"id": "aceite_oliva", "gramos": 80}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Pela y corta las patatas en laminas finas. Frielas a fuego medio con la cebolla, 20 minutos.", "Escurre el aceite y mezcla con los huevos batidos y sal. Deja reposar 5 minutos.", "Cuaja en la sarten 4 minutos por cada lado."] },
+
+    { "id": "revuelto_champinones", "nombre": "Revuelto de champinones", "dietas": ["equilibrada", "vegetariana", "proteina"], "raciones": 4, "minutos": 20,
+      "ingredientes": [{"id": "huevo", "gramos": 360}, {"id": "champinones", "gramos": 400}, {"id": "pan", "gramos": 200}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 30}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Saltea los champinones laminados con el ajo hasta que suelten el agua y se doren.", "Anade los huevos batidos y remueve a fuego suave hasta cuajar.", "Sirve con pan tostado."] },
+
+    { "id": "berenjenas_gratinadas", "nombre": "Berenjenas gratinadas", "dietas": ["equilibrada", "vegetariana"], "raciones": 4, "minutos": 50,
+      "ingredientes": [{"id": "berenjena", "gramos": 800}, {"id": "tomate_triturado", "gramos": 400}, {"id": "cebolla", "gramos": 150}, {"id": "queso_rallado", "gramos": 120}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 30}, {"id": "oregano", "gramos": 2}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Corta las berenjenas por la mitad, marca la carne y asalas 25 minutos a 200 grados.", "Sofrie cebolla y ajo, anade el tomate y el oregano. Cocina 12 minutos.", "Rellena las berenjenas, cubre con queso y gratina 10 minutos."] },
+
+    { "id": "pasta_champinones", "nombre": "Pasta con champinones a la crema", "dietas": ["equilibrada", "vegetariana"], "raciones": 4, "minutos": 25,
+      "ingredientes": [{"id": "macarrones", "gramos": 350}, {"id": "champinones", "gramos": 400}, {"id": "nata_cocinar", "gramos": 200}, {"id": "cebolla", "gramos": 120}, {"id": "queso_rallado", "gramos": 60}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 20}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Cuece la pasta.", "Saltea la cebolla, el ajo y los champinones laminados.", "Anade la nata y reduce 5 minutos.", "Mezcla con la pasta y el queso rallado."] },
+
+    { "id": "pisto_huevo", "nombre": "Pisto con huevo", "dietas": ["equilibrada", "vegetariana"], "raciones": 4, "minutos": 45,
+      "ingredientes": [{"id": "calabacin", "gramos": 400}, {"id": "berenjena", "gramos": 300}, {"id": "pimiento_rojo", "gramos": 200}, {"id": "pimiento_verde", "gramos": 200}, {"id": "cebolla", "gramos": 200}, {"id": "tomate_triturado", "gramos": 400}, {"id": "huevo", "gramos": 240}, {"id": "aceite_oliva", "gramos": 40}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Corta todas las verduras en dados pequenos.", "Pocha la cebolla y los pimientos 10 minutos, anade calabacin y berenjena.", "Incorpora el tomate y cocina 20 minutos a fuego lento.", "Sirve con un huevo frito o escalfado por racion."] },
+
+    { "id": "tortilla_calabacin", "nombre": "Tortilla de calabacin", "dietas": ["equilibrada", "vegetariana"], "raciones": 4, "minutos": 35,
+      "ingredientes": [{"id": "calabacin", "gramos": 500}, {"id": "huevo", "gramos": 360}, {"id": "cebolla", "gramos": 150}, {"id": "patata", "gramos": 300}, {"id": "aceite_oliva", "gramos": 50}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Pocha la patata, el calabacin y la cebolla en laminas, 18 minutos.", "Escurre y mezcla con el huevo batido y sal.", "Cuaja 4 minutos por cada lado."] },
+
+    { "id": "arroz_verduras_huevo", "nombre": "Arroz salteado con verduras y huevo", "dietas": ["equilibrada", "vegetariana"], "raciones": 4, "minutos": 30,
+      "ingredientes": [{"id": "arroz", "gramos": 320}, {"id": "calabacin", "gramos": 250}, {"id": "zanahoria", "gramos": 200}, {"id": "guisantes", "gramos": 150}, {"id": "huevo", "gramos": 180}, {"id": "cebolla", "gramos": 120}, {"id": "salsa_soja", "gramos": 30}, {"id": "aceite_oliva", "gramos": 25}],
+      "pasos": ["Cuece el arroz y escurrelo.", "Saltea la cebolla, la zanahoria y el calabacin en dados. Anade los guisantes.", "Aparta las verduras, cuaja el huevo batido y mezclalo todo con el arroz y la soja."] },
+
+    { "id": "crema_calabaza", "nombre": "Crema de calabaza", "dietas": ["equilibrada", "vegetariana"], "raciones": 4, "minutos": 35,
+      "ingredientes": [{"id": "calabaza", "gramos": 800}, {"id": "patata", "gramos": 300}, {"id": "puerro", "gramos": 200}, {"id": "caldo_verduras", "gramos": 600}, {"id": "queso_fresco", "gramos": 200}, {"id": "pan", "gramos": 200}, {"id": "aceite_oliva", "gramos": 25}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Pocha el puerro en la olla.", "Anade la calabaza y la patata en trozos y cubre con el caldo.", "Cuece 25 minutos y tritura hasta que quede fino.", "Sirve con el queso fresco desmenuzado y pan tostado."] },
+
+    { "id": "ensalada_quinoa", "nombre": "Ensalada de quinoa y queso fresco", "dietas": ["equilibrada", "vegetariana"], "raciones": 4, "minutos": 25,
+      "ingredientes": [{"id": "quinoa", "gramos": 300}, {"id": "tomate", "gramos": 300}, {"id": "pepino", "gramos": 200}, {"id": "queso_fresco", "gramos": 200}, {"id": "aceitunas", "gramos": 80}, {"id": "limon", "gramos": 50}, {"id": "aceite_oliva", "gramos": 30}, {"id": "sal", "gramos": 3}],
+      "pasos": ["Cuece la quinoa 15 minutos y enfriala.", "Corta el tomate y el pepino en dados.", "Mezcla con el queso en dados y las aceitunas.", "Alina con aceite, limon y sal."] },
+
+    { "id": "lasana_verduras", "nombre": "Lasana de verduras", "dietas": ["equilibrada", "vegetariana"], "raciones": 4, "minutos": 65,
+      "ingredientes": [{"id": "placas_lasana", "gramos": 250}, {"id": "calabacin", "gramos": 300}, {"id": "berenjena", "gramos": 300}, {"id": "tomate_triturado", "gramos": 400}, {"id": "cebolla", "gramos": 150}, {"id": "leche", "gramos": 400}, {"id": "harina", "gramos": 40}, {"id": "mantequilla", "gramos": 40}, {"id": "queso_rallado", "gramos": 120}, {"id": "aceite_oliva", "gramos": 25}],
+      "pasos": ["Saltea las verduras en dados y anade el tomate. Cocina 15 minutos.", "Prepara la bechamel con mantequilla, harina y leche.", "Monta capas de placas, verduras y bechamel.", "Cubre con queso y hornea 25 minutos a 190 grados."] },
+
+    { "id": "coliflor_gratinada", "nombre": "Coliflor gratinada", "dietas": ["equilibrada", "vegetariana"], "raciones": 4, "minutos": 45,
+      "ingredientes": [{"id": "coliflor", "gramos": 900}, {"id": "patata", "gramos": 400}, {"id": "leche", "gramos": 400}, {"id": "harina", "gramos": 40}, {"id": "mantequilla", "gramos": 40}, {"id": "queso_rallado", "gramos": 120}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Cuece la coliflor en ramilletes y la patata en trozos, 15 minutos.", "Prepara la bechamel con mantequilla, harina y leche.", "Coloca la verdura en una fuente, cubre con bechamel y queso.", "Gratina 12 minutos."] },
+
+    { "id": "tofu_salteado", "nombre": "Tofu salteado con verduras", "dietas": ["equilibrada", "vegetariana", "vegana", "proteina"], "raciones": 4, "minutos": 30,
+      "ingredientes": [{"id": "tofu", "gramos": 500}, {"id": "brocoli", "gramos": 300}, {"id": "pimiento_rojo", "gramos": 200}, {"id": "zanahoria", "gramos": 150}, {"id": "arroz", "gramos": 300}, {"id": "salsa_soja", "gramos": 40}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 25}],
+      "pasos": ["Cuece el arroz.", "Escurre bien el tofu, cortalo en dados y dorálo por todas sus caras.", "Saltea las verduras en tiras con el ajo, 8 minutos.", "Junta todo con la salsa de soja y saltea 2 minutos."] },
+
+    { "id": "cuscus_verduras", "nombre": "Cuscus de verduras y garbanzos", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 30,
+      "ingredientes": [{"id": "cuscus", "gramos": 300}, {"id": "garbanzos_cocidos", "gramos": 400}, {"id": "calabacin", "gramos": 250}, {"id": "zanahoria", "gramos": 200}, {"id": "pimiento_rojo", "gramos": 200}, {"id": "cebolla", "gramos": 150}, {"id": "caldo_verduras", "gramos": 350}, {"id": "comino", "gramos": 4}, {"id": "aceite_oliva", "gramos": 30}],
+      "pasos": ["Hidrata el cuscus con el caldo hirviendo y un chorro de aceite. Tapa 5 minutos.", "Saltea las verduras en dados con el comino, 12 minutos.", "Anade los garbanzos escurridos.", "Mezcla con el cuscus desgranado con un tenedor."] },
+
+    { "id": "crema_verduras", "nombre": "Crema de verduras", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 35,
+      "ingredientes": [{"id": "puerro", "gramos": 300}, {"id": "patata", "gramos": 500}, {"id": "zanahoria", "gramos": 250}, {"id": "calabacin", "gramos": 250}, {"id": "caldo_verduras", "gramos": 800}, {"id": "pan", "gramos": 200}, {"id": "aceite_oliva", "gramos": 25}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Pocha el puerro en la olla con aceite.", "Anade el resto de verduras en trozos y cubre con el caldo.", "Cuece 25 minutos y tritura.", "Sirve con pan tostado."] },
+
+    { "id": "patatas_riojana", "nombre": "Patatas a la riojana vegetarianas", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 45,
+      "ingredientes": [{"id": "patata", "gramos": 900}, {"id": "alubias_cocidas", "gramos": 400}, {"id": "pimiento_rojo", "gramos": 200}, {"id": "cebolla", "gramos": 150}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 30}, {"id": "pimenton", "gramos": 5}, {"id": "laurel", "gramos": 1}, {"id": "sal", "gramos": 5}],
+      "pasos": ["Sofrie cebolla, ajo y pimiento 10 minutos.", "Anade el pimenton fuera del fuego para que no amargue.", "Casca las patatas en trozos, anadelas con el laurel y cubre con agua.", "Cuece 30 minutos y anade las alubias los ultimos 5."] },
+
+    { "id": "espaguetis_tomate", "nombre": "Espaguetis con tomate y ajo", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 25,
+      "ingredientes": [{"id": "espaguetis", "gramos": 350}, {"id": "tomate_triturado", "gramos": 500}, {"id": "cebolla", "gramos": 120}, {"id": "ajo", "gramos": 15}, {"id": "aceite_oliva", "gramos": 30}, {"id": "oregano", "gramos": 3}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Cuece la pasta al dente.", "Dora el ajo laminado en aceite y anade la cebolla picada.", "Incorpora el tomate y el oregano y cocina 15 minutos.", "Mezcla con la pasta y un poco de su agua de coccion."] },
+
+    { "id": "ensalada_garbanzos_aguacate", "nombre": "Ensalada de garbanzos y aguacate", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 15,
+      "ingredientes": [{"id": "garbanzos_cocidos", "gramos": 700}, {"id": "aguacate", "gramos": 300}, {"id": "tomate", "gramos": 300}, {"id": "cebolla", "gramos": 80}, {"id": "limon", "gramos": 60}, {"id": "aceite_oliva", "gramos": 30}, {"id": "comino", "gramos": 3}, {"id": "sal", "gramos": 3}],
+      "pasos": ["Enjuaga y escurre los garbanzos.", "Corta el aguacate, el tomate y la cebolla en dados.", "Mezcla y alina con aceite, limon, comino y sal."] },
+
+    { "id": "wok_fideos_verduras", "nombre": "Wok de fideos con verduras", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 25,
+      "ingredientes": [{"id": "fideos", "gramos": 300}, {"id": "brocoli", "gramos": 250}, {"id": "zanahoria", "gramos": 200}, {"id": "pimiento_rojo", "gramos": 200}, {"id": "champinones", "gramos": 200}, {"id": "salsa_soja", "gramos": 40}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 25}],
+      "pasos": ["Cuece los fideos y escurrelos.", "Saltea a fuego fuerte el ajo, la zanahoria y el brocoli, 5 minutos.", "Anade el pimiento y los champinones, 5 minutos mas.", "Incorpora los fideos y la salsa de soja y saltea 2 minutos."] },
+
+    { "id": "bolonesa_soja", "nombre": "Bolonesa de soja texturizada", "dietas": ["equilibrada", "vegetariana", "vegana", "proteina"], "raciones": 4, "minutos": 35,
+      "ingredientes": [{"id": "soja_texturizada", "gramos": 150}, {"id": "espaguetis", "gramos": 350}, {"id": "tomate_triturado", "gramos": 500}, {"id": "cebolla", "gramos": 150}, {"id": "zanahoria", "gramos": 120}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 25}, {"id": "oregano", "gramos": 3}],
+      "pasos": ["Hidrata la soja texturizada en agua caliente 10 minutos y escurrela bien.", "Pocha cebolla, ajo y zanahoria picados.", "Anade la soja escurrida y dorala 5 minutos.", "Incorpora el tomate y el oregano, cocina 15 minutos y mezcla con la pasta cocida."] },
+
+    { "id": "berenjenas_quinoa", "nombre": "Berenjenas al horno con quinoa", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 45,
+      "ingredientes": [{"id": "berenjena", "gramos": 800}, {"id": "quinoa", "gramos": 250}, {"id": "tomate_triturado", "gramos": 400}, {"id": "cebolla", "gramos": 150}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 30}, {"id": "oregano", "gramos": 3}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Asa las berenjenas en mitades 25 minutos a 200 grados.", "Cuece la quinoa 15 minutos.", "Sofrie cebolla y ajo, anade el tomate y el oregano.", "Mezcla la quinoa con el sofrito y rellena las berenjenas."] },
+
+    { "id": "menestra_salteada", "nombre": "Menestra salteada con almendras", "dietas": ["equilibrada", "vegetariana", "vegana"], "raciones": 4, "minutos": 25,
+      "ingredientes": [{"id": "menestra", "gramos": 800}, {"id": "patata", "gramos": 400}, {"id": "almendras", "gramos": 50}, {"id": "ajo", "gramos": 15}, {"id": "aceite_oliva", "gramos": 30}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Cuece la menestra y las patatas en dados, 12 minutos. Escurre bien.", "Dora el ajo laminado y las almendras en aceite.", "Anade la verdura escurrida y saltea 5 minutos."] },
+
+    { "id": "pollo_brocoli_integral", "nombre": "Pollo con brocoli y arroz integral", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 40,
+      "ingredientes": [{"id": "pechuga_pollo", "gramos": 700}, {"id": "brocoli", "gramos": 500}, {"id": "arroz_integral", "gramos": 300}, {"id": "salsa_soja", "gramos": 30}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 25}, {"id": "sal", "gramos": 3}],
+      "pasos": ["Cuece el arroz integral 30 minutos.", "Cuece el brocoli al vapor 6 minutos, que quede firme.", "Saltea el pollo en tiras con el ajo hasta que dore.", "Junta todo con la salsa de soja."] },
+
+    { "id": "ensalada_pollo_aguacate", "nombre": "Ensalada de pollo y aguacate", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 25,
+      "ingredientes": [{"id": "pechuga_pollo", "gramos": 600}, {"id": "lechuga", "gramos": 300}, {"id": "aguacate", "gramos": 300}, {"id": "tomate", "gramos": 300}, {"id": "maiz_dulce", "gramos": 150}, {"id": "limon", "gramos": 50}, {"id": "aceite_oliva", "gramos": 30}, {"id": "sal", "gramos": 3}],
+      "pasos": ["Haz el pollo a la plancha con sal y cortalo en tiras.", "Trocea la lechuga, el tomate y el aguacate.", "Monta con el maiz y el pollo templado.", "Alina con aceite, limon y sal."] },
+
+    { "id": "bowl_atun_quinoa", "nombre": "Bowl de atun y quinoa", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 25,
+      "ingredientes": [{"id": "atun_lata", "gramos": 300}, {"id": "quinoa", "gramos": 300}, {"id": "tomate", "gramos": 250}, {"id": "pepino", "gramos": 200}, {"id": "aguacate", "gramos": 200}, {"id": "limon", "gramos": 50}, {"id": "aceite_oliva", "gramos": 25}, {"id": "sal", "gramos": 3}],
+      "pasos": ["Cuece la quinoa 15 minutos y dejala templar.", "Corta el tomate, el pepino y el aguacate en dados.", "Monta el bowl con la quinoa de base, el atun escurrido y las verduras.", "Alina con aceite, limon y sal."] },
+
+    { "id": "salmon_quinoa_espinacas", "nombre": "Salmon con quinoa y espinacas", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 30,
+      "ingredientes": [{"id": "salmon", "gramos": 600}, {"id": "quinoa", "gramos": 280}, {"id": "espinacas", "gramos": 300}, {"id": "limon", "gramos": 60}, {"id": "ajo", "gramos": 10}, {"id": "aceite_oliva", "gramos": 25}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Cuece la quinoa 15 minutos.", "Saltea las espinacas con el ajo laminado.", "Haz el salmon a la plancha 4 minutos por lado.", "Sirve el salmon sobre la quinoa y las espinacas, con limon."] },
+
+    { "id": "pavo_cuscus", "nombre": "Pavo con cuscus y verduras", "dietas": ["equilibrada", "proteina"], "raciones": 4, "minutos": 30,
+      "ingredientes": [{"id": "pechuga_pavo", "gramos": 600}, {"id": "cuscus", "gramos": 280}, {"id": "calabacin", "gramos": 250}, {"id": "pimiento_rojo", "gramos": 200}, {"id": "cebolla", "gramos": 120}, {"id": "caldo_verduras", "gramos": 320}, {"id": "comino", "gramos": 3}, {"id": "aceite_oliva", "gramos": 25}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Hidrata el cuscus con el caldo hirviendo, tapado 5 minutos.", "Saltea las verduras en dados con el comino.", "Haz el pavo a la plancha y cortalo en tiras.", "Sirve todo mezclado."] },
+
+    { "id": "tortilla_espinacas_queso", "nombre": "Tortilla de espinacas y queso fresco", "dietas": ["equilibrada", "vegetariana", "proteina"], "raciones": 4, "minutos": 25,
+      "ingredientes": [{"id": "huevo", "gramos": 420}, {"id": "espinacas", "gramos": 300}, {"id": "queso_fresco", "gramos": 200}, {"id": "cebolla", "gramos": 100}, {"id": "aceite_oliva", "gramos": 25}, {"id": "sal", "gramos": 4}],
+      "pasos": ["Pocha la cebolla y anade las espinacas hasta que reduzcan. Escurre el liquido.", "Bate los huevos con sal y mezcla con las espinacas y el queso en dados.", "Cuaja en la sarten 4 minutos por lado."] }
+
+  ]
+}

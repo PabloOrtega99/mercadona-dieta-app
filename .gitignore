@@ -1,0 +1,48 @@
+# ---------------------------------------------------------------------------
+# .gitignore  —  Qué NO se sube a GitHub
+#
+# Git sube TODO lo que hay en la carpeta, salvo lo que aparezca aquí.
+# Aquí ponemos dos tipos de cosas:
+#   1. Lo que se genera solo (si se borra, se vuelve a crear con un comando).
+#   2. Lo que pesa mucho o es de tu ordenador concreto.
+# Regla mental: "si lo puedo regenerar, no lo subo".
+# ---------------------------------------------------------------------------
+
+# El entorno virtual de Python: son cientos de MB de librerías descargadas.
+# En otro ordenador se recrea con:  pip install -r requirements.txt
+.venv/
+venv/
+
+# Archivos temporales que Python genera al ejecutar el código.
+__pycache__/
+*.pyc
+
+# Datos generados: el catálogo de Mercadona y las imágenes de las recetas.
+# Se regeneran con:  python scripts/actualizar_catalogo.py
+#
+# OJO A LA BARRA DEL PRINCIPIO. Es importantísima y casi cuesta un disgusto.
+#
+# Escrito como "datos/" (sin barra delante), Git ignora CUALQUIER carpeta que
+# se llame así, esté donde esté. O sea, ignoraba también app/datos/, que es
+# donde viven las recetas y los ingredientes escritos a mano. Se descubrió
+# mirando la lista de archivos del primer commit: no estaban.
+#
+# Habría sido un desastre silencioso: el proyecto se sube aparentemente bien,
+# y al clonarlo en el otro ordenador no hay recetas y nadie sabe por qué.
+#
+# Con la barra delante, "/datos/" significa "solo la carpeta datos que está en
+# la raíz del proyecto". app/datos/ se sube, que es lo que queremos.
+#
+# Moraleja: después del primer "git add .", mira SIEMPRE "git status" y
+# comprueba que está lo que tiene que estar.
+/datos/
+
+# Configuración local de editores y herramientas. Es de este ordenador
+# concreto, no del proyecto.
+.vscode/
+.idea/
+.claude/
+
+# Windows
+Thumbs.db
+desktop.ini
