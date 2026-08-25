@@ -176,10 +176,20 @@
                 </span>
               </div>
             {% else %}
-              <img class="foto-producto" src="{{ linea.producto.url_imagen }}"
-                   alt="" loading="lazy">
+              {# El enlace lleva a la ficha del producto en Mercadona.
+                 target="_blank" lo abre en otra pestaña para no perder la lista.
+                 rel="noopener" va siempre con target="_blank": sin él, la
+                 página que abres puede manipular la tuya desde JavaScript. #}
+              <a class="enlace-producto" href="{{ linea.producto.url_web }}"
+                 target="_blank" rel="noopener">
+                <img class="foto-producto" src="{{ linea.producto.url_imagen }}"
+                     alt="" loading="lazy">
+              </a>
               <div class="linea-texto">
-                <strong>{{ linea.producto.nombre }}</strong>
+                <strong>
+                  <a class="enlace-producto" href="{{ linea.producto.url_web }}"
+                     target="_blank" rel="noopener">{{ linea.producto.nombre }}</a>
+                </strong>
                 <span class="linea-detalle">
                   {{ linea.producto.precio | euros }} el envase
                   {%- if linea.producto.precio_referencia %}
@@ -223,6 +233,28 @@
     </span>
     <strong>{{ plan.coste_total | euros }}</strong>
   </div>
+
+  {# --- Llevar la lista al carrito de la tienda online ------------------- #}
+  {# Los productos viajan en campos ocultos, no se recalcula el plan al otro
+     lado. Asi el carrito contiene EXACTAMENTE lo que estas viendo, que es lo
+     unico aceptable cuando se trata de dinero. #}
+  <form class="completar" method="post" action="{{ url_for('completar_compra') }}">
+    {% for grupo in compra %}
+      {% for linea in grupo.lineas %}
+        {% if not linea.sin_producto %}
+          <input type="hidden" name="producto_{{ linea.producto.id }}" value="{{ linea.unidades }}">
+          <input type="hidden" name="nombre_{{ linea.producto.id }}" value="{{ linea.producto.nombre }}">
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+
+    <button type="submit" class="boton-principal">🛒 Completar compra en Mercadona</button>
+    <p class="ayuda">
+      Mete estos productos en tu carrito de la tienda online.
+      <strong>No compra nada</strong>: después revisas la cesta y pagas tú.
+      Hace falta <a href="{{ url_for('configurar_token') }}">conectar tu cuenta</a> una vez.
+    </p>
+  </form>
 </section>
 
 {# --- EL INFORME NUTRICIONAL ----------------------------------------------- #}

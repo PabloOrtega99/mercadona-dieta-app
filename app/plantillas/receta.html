@@ -8,12 +8,31 @@
 <article class="ficha">
 
   <div class="ficha-cabecera">
-    <img class="ficha-imagen"
-         src="{{ url_for('imagen_receta', id_receta=receta.id) }}"
-         alt="{{ receta.nombre }}">
+    <div>
+      <img class="ficha-imagen"
+           src="{{ url_for('imagen_receta', id_receta=receta.id) }}"
+           alt="{{ receta.nombre }}">
+      {# Si la foto es de otra persona hay que citarla: es lo que exigen las
+         licencias Creative Commons, y ademas es lo justo. Los collages no
+         llevan atribucion porque se montan con las fotos de Mercadona. #}
+      {% if imagen %}
+        <p class="atribucion">
+          Foto:
+          {% if imagen.enlace %}
+            <a href="{{ imagen.enlace }}" target="_blank" rel="noopener">{{ imagen.titulo }}</a>
+          {% else %}{{ imagen.titulo }}{% endif %}
+          de {{ imagen.autor }} ·
+          {% if imagen.licencia_url %}
+            <a href="{{ imagen.licencia_url }}" target="_blank" rel="noopener">{{ imagen.licencia }}</a>
+          {% else %}{{ imagen.licencia }}{% endif %}
+          · vía {{ imagen.origen }}
+        </p>
+      {% endif %}
+    </div>
     <div class="ficha-datos">
       <h1>{{ receta.nombre }}</h1>
       <p class="ficha-etiquetas">
+        <span class="pastilla pastilla-{{ receta.dificultad }}">{{ receta.nombre_dificultad }}</span>
         {% for dieta in receta.dietas %}
           <span class="insignia">{{ nombres_dietas[dieta] }}</span>
         {% endfor %}
@@ -74,9 +93,15 @@
               <span class="linea-detalle">sin producto encontrado</span>
             </div>
           {% else %}
-            <img class="foto-producto" src="{{ linea.producto.url_imagen }}" alt="" loading="lazy">
+            <a class="enlace-producto" href="{{ linea.producto.url_web }}"
+               target="_blank" rel="noopener">
+              <img class="foto-producto" src="{{ linea.producto.url_imagen }}" alt="" loading="lazy">
+            </a>
             <div class="linea-texto">
-              <strong>{{ linea.producto.nombre }}</strong>
+              <strong>
+                <a class="enlace-producto" href="{{ linea.producto.url_web }}"
+                   target="_blank" rel="noopener">{{ linea.producto.nombre }}</a>
+              </strong>
               <span class="linea-detalle">
                 {{ linea.producto.precio | euros }} el envase ·
                 necesitas {{ linea.gramos_necesarios | gramos }}

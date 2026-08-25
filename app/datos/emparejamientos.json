@@ -74,6 +74,15 @@
       "Alubia cocida blanca Hacendado"
     ]
   },
+  "anacardos": {
+    "fijado": false,
+    "productos": [
+      "23365"
+    ],
+    "_nombres": [
+      "Anacardo natural Hacendado"
+    ]
+  },
   "arroz": {
     "fijado": false,
     "productos": [
@@ -199,6 +208,17 @@
     "_nombres": [
       "Brócoli Hacendado ultracongelado",
       "Brócoli"
+    ]
+  },
+  "brotes": {
+    "fijado": false,
+    "productos": [
+      "69810",
+      "69757"
+    ],
+    "_nombres": [
+      "Ensalada mezcla brotes tiernos maxi lavada",
+      "Ensalada mezcla brotes tiernos lavada"
     ]
   },
   "cafe": {
@@ -351,6 +371,15 @@
       "Chorizo extra pimienta Hacendado finas lonchas"
     ]
   },
+  "col": {
+    "fijado": false,
+    "productos": [
+      "68462"
+    ],
+    "_nombres": [
+      "Repollo liso partido"
+    ]
+  },
   "coliflor": {
     "fijado": false,
     "productos": [
@@ -369,6 +398,15 @@
     ],
     "_nombres": [
       "Comino molido Hacendado"
+    ]
+  },
+  "crema_cacahuete": {
+    "fijado": false,
+    "productos": [
+      "16883"
+    ],
+    "_nombres": [
+      "Crema de cacahuete 100% Hacendado"
     ]
   },
   "curry": {
@@ -549,6 +587,17 @@
       "Taquitos de jamón Incarlopsa"
     ]
   },
+  "jengibre": {
+    "fijado": false,
+    "productos": [
+      "69289",
+      "34149"
+    ],
+    "_nombres": [
+      "Jengibre",
+      "Jengibre molido Hacendado"
+    ]
+  },
   "judias_verdes": {
     "fijado": false,
     "productos": [
@@ -700,6 +749,17 @@
       "Manzanas Golden",
       "Manzana Golden",
       "Manzana Granny Smith"
+    ]
+  },
+  "masa_pizza": {
+    "fijado": false,
+    "productos": [
+      "52454",
+      "13985"
+    ],
+    "_nombres": [
+      "Masa pizza fresca familiar Hacendado",
+      "Masa fresca pizza Hacendado"
     ]
   },
   "mayonesa": {
@@ -870,6 +930,15 @@
       "Pan de molde blanco sin corteza Hacendado"
     ]
   },
+  "pan_pita": {
+    "fijado": false,
+    "productos": [
+      "14378"
+    ],
+    "_nombres": [
+      "Pan de pita Mission"
+    ]
+  },
   "pan_rallado": {
     "fijado": false,
     "productos": [
@@ -938,6 +1007,17 @@
     ],
     "_nombres": [
       "Pera Conferencia"
+    ]
+  },
+  "pesto": {
+    "fijado": false,
+    "productos": [
+      "35438",
+      "35186"
+    ],
+    "_nombres": [
+      "Salsa Pesto con albahaca Hacendado",
+      "Salsa fresca Pesto con albahaca Hacendado"
     ]
   },
   "pimenton": {
@@ -1009,6 +1089,15 @@
       "Puerros"
     ]
   },
+  "queso_feta": {
+    "fijado": false,
+    "productos": [
+      "51197"
+    ],
+    "_nombres": [
+      "Queso feta mezcla Hacendado en dados"
+    ]
+  },
   "queso_fresco": {
     "fijado": false,
     "productos": [
@@ -1033,6 +1122,15 @@
       "Queso rallado especial fundir mezcla Hacendado",
       "Queso rallado especial fundir mezcla Hacendado",
       "Queso rallado emmental gratinar Hacendado"
+    ]
+  },
+  "queso_untar": {
+    "fijado": false,
+    "productos": [
+      "51203"
+    ],
+    "_nombres": [
+      "Queso untar suave de vaca Hacendado"
     ]
   },
   "quinoa": {
@@ -1097,6 +1195,15 @@
       "Soja texturizada Luengo"
     ]
   },
+  "surimi": {
+    "fijado": false,
+    "productos": [
+      "62502"
+    ],
+    "_nombres": [
+      "Palitos de surimi Hacendado"
+    ]
+  },
   "tofu": {
     "fijado": false,
     "productos": [
@@ -1117,6 +1224,17 @@
       "Tomate pera",
       "Tomates pera",
       "Tomates cherry pera kumato"
+    ]
+  },
+  "tomate_cherry": {
+    "fijado": false,
+    "productos": [
+      "69990",
+      "69414"
+    ],
+    "_nombres": [
+      "Tomates cherry",
+      "Tomates cherry en rama Dulcita"
     ]
   },
   "tomate_frito": {

@@ -131,6 +131,32 @@ def guardar_emparejamientos(emparejamientos: dict[str, dict]) -> None:
         archivo.write("\n")
 
 
+def _palabras_prohibidas(ingrediente: Ingrediente) -> list[str]:
+    """Junta las palabras que descartan un producto para este ingrediente.
+
+    Son las suyas propias mas las globales, PERO con una excepcion: si una
+    palabra global aparece en los terminos de busqueda del ingrediente, no se
+    aplica.
+
+    El caso que obligo a esto: "pizza" esta en la lista global porque las
+    pizzas no son un ingrediente. Pero la masa de pizza SI lo es, y su producto
+    en Mercadona se llama "Masa pizza fresca familiar". La exclusion global se
+    lo llevaba por delante.
+
+    La regla se lee sola: si estas buscando la palabra a proposito, es que
+    sabes lo que haces y no hay que protegerte de ella.
+    """
+    prohibidas = [normalizar_texto(p) for p in ingrediente.excluir]
+
+    buscadas = normalizar_texto(" ".join(ingrediente.busqueda))
+    for palabra in EXCLUSIONES_GLOBALES:
+        normalizada = normalizar_texto(palabra)
+        if normalizada and normalizada not in buscadas:
+            prohibidas.append(normalizada)
+
+    return prohibidas
+
+
 def _palabra_encaja(palabra_buscada: str, palabra_producto: str) -> bool:
     """¿La palabra del producto se corresponde con la que buscamos?
 
@@ -193,8 +219,7 @@ def buscar_candidatos(
     Y todo eso dos veces: primero exigiendo que el nombre del producto EMPIECE
     por lo buscado, y solo si asi no sale nada, con el criterio relajado.
     """
-    prohibidas = [normalizar_texto(p) for p in ingrediente.excluir]
-    prohibidas += [normalizar_texto(p) for p in EXCLUSIONES_GLOBALES]
+    prohibidas = _palabras_prohibidas(ingrediente)
 
     # Primero la vuelta estricta con todos los términos; si ninguno da nada,
     # la vuelta relajada. Este orden importa: más vale el término genérico

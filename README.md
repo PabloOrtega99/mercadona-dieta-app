@@ -1,17 +1,20 @@
 # Menús y lista de la compra de Mercadona
 
-Aplicación web de uso personal. Le dices **cuánto quieres gastar**, **para cuántas semanas**, **qué dieta** y **para cuánta gente**, y te devuelve:
+Aplicación web de uso personal. Le dices **cuánto quieres gastar**, **para cuántas semanas**, **qué dieta** y **para cuánta gente**; **eliges las recetas que te apetecen** de entre las que propone; y te devuelve:
 
-- Un **menú** de comidas y cenas con recetas concretas.
-- La **lista de la compra de Mercadona**, con productos y precios reales, agrupada por sección del supermercado.
+- Un **menú** de comidas y cenas, día a día.
+- La **lista de la compra de Mercadona**, con productos y precios reales, agrupada por sección del supermercado y con **enlace a cada producto**.
 - Un **informe nutricional** del plan.
+- Un botón para **meter la lista en tu carrito** de la tienda online.
 
 Los precios se descargan de la API pública de `tienda.mercadona.es`, así que se mantienen al día ejecutando un solo comando.
 
 ```
-   80 €  ·  2 semanas  ·  1 persona  ·  equilibrada
-                        ↓
-   7 recetas · 28 comidas · 36 productos · 79,22 €
+   80 € · 2 semanas · 1 persona · equilibrada
+                     ↓
+   eliges tus recetas de entre 130
+                     ↓
+   menú de 28 comidas · 36 productos · 79,22 € · al carrito
 ```
 
 ---
@@ -39,6 +42,13 @@ python scripts/actualizar_catalogo.py
 python -m app.web
 ```
 
+Opcional, para que las recetas tengan foto de plato (si no, se usa un collage
+con las fotos de sus productos, que también funciona):
+
+```powershell
+python scripts/buscar_fotos.py --preseleccionar
+```
+
 Y se abre solo `http://localhost:8000`.
 
 Los pasos 1-4 son solo la primera vez. Después, **doble clic en `arrancar.bat`**.
@@ -59,6 +69,9 @@ Los pasos 1-4 son solo la primera vez. Después, **doble clic en `arrancar.bat`*
 | Rehacer los emparejamientos | `python scripts/revisar_emparejamientos.py --regenerar` |
 | Buscar emparejamientos sospechosos | `python scripts/comprobar_precios.py` |
 | Probar el algoritmo sin la web | `python scripts/probar_plan.py` |
+| Buscar fotos para recetas nuevas | `python scripts/buscar_fotos.py --solo-nuevas` |
+| Cambiar la foto de una receta | En la app: `/fotos` |
+| Conectar con mi cuenta de Mercadona | En la app: `/carrito/token` |
 
 **Trabajando desde dos ordenadores:** `git pull` al empezar, `git push` al terminar. La guía completa está en [`docs/01-git-y-github.md`](docs/01-git-y-github.md).
 
@@ -70,8 +83,8 @@ Tres archivos de texto que puedes editar con el Bloc de notas:
 
 | Archivo | Qué contiene |
 |---|---|
-| [`app/datos/recetas.json`](app/datos/recetas.json) | Las 60 recetas |
-| [`app/datos/ingredientes.json`](app/datos/ingredientes.json) | Los 105 ingredientes y sus datos nutricionales |
+| [`app/datos/recetas.json`](app/datos/recetas.json) | Las 130 recetas |
+| [`app/datos/ingredientes.json`](app/datos/ingredientes.json) | Los 117 ingredientes y sus datos nutricionales |
 | [`app/datos/basicos_desayuno.json`](app/datos/basicos_desayuno.json) | Lo que se consume de desayuno |
 
 Después de editar cualquiera de ellos:
@@ -99,7 +112,9 @@ Está pensada para leerse en orden, y explica **por qué** se ha hecho cada cosa
 | 04 | [Nutrición y recetas](docs/04-nutricion-y-recetas.md) | Los datos que puedes editar tú |
 | 05 | [Emparejar ingredientes y productos](docs/05-emparejar-ingredientes-productos.md) | El puente entre receta y supermercado |
 | 06 | [**El algoritmo del menú**](docs/06-el-algoritmo-del-menu.md) | **El más interesante**, con ejemplo numérico |
-| 07 | [La interfaz web](docs/07-la-interfaz-web.md) | Flask, plantillas y CSS |
+| 07 | [La interfaz web](docs/07-la-interfaz-web.md) | Flask, plantillas, CSS y el flujo de tres pasos |
+| 08 | [Completar la compra](docs/08-completar-la-compra.md) | El token y el carrito de la tienda online |
+| 09 | [Las fotos de los platos](docs/09-las-fotos-de-los-platos.md) | Tres intentos fallidos antes de acertar |
 
 ---
 
@@ -115,13 +130,17 @@ mercadona-dieta-app/
 │   ├── datos_app.py             carga todo de una vez
 │   ├── utiles.py                funciones pequeñas compartidas
 │   ├── mercadona/
-│   │   ├── cliente.py           ← ÚNICO sitio que habla con Mercadona
-│   │   └── catalogo.py          guarda el catálogo en SQLite
+│   │   ├── cliente.py           ← ÚNICO sitio que LEE de Mercadona
+│   │   ├── catalogo.py          guarda el catálogo en SQLite
+│   │   └── carrito.py           ← ÚNICO sitio que ESCRIBE en Mercadona
 │   ├── planificador/
 │   │   ├── emparejador.py       ingrediente → producto real
 │   │   ├── cesta.py             cuántos envases y cuánto cuestan
 │   │   └── planificador.py      ← EL ALGORITMO
-│   ├── imagenes/collage.py      la foto de cada receta
+│   ├── imagenes/
+│   │   ├── buscador.py          busca fotos de plato
+│   │   ├── fotos.py             descarga y cachea la elegida
+│   │   └── collage.py           red de seguridad si no hay foto
 │   ├── datos/                   los JSON que puedes editar
 │   ├── plantillas/              el HTML
 │   └── estaticos/               el CSS
@@ -146,7 +165,9 @@ Cada archivo tiene **un solo trabajo**. Si Mercadona cambia su API, solo se toca
 
 ## Límites, dichos claramente
 
-- **La API de Mercadona no es oficial.** Puede cambiar sin avisar. Todo el acceso está aislado en `app/mercadona/cliente.py`, así que si cambia solo hay que tocar ese archivo. Las peticiones van espaciadas 0,4 s y con un `User-Agent` que se identifica honestamente.
+- **La API de Mercadona no es oficial.** Puede cambiar sin avisar. Todo el acceso está aislado en `cliente.py` (leer) y `carrito.py` (escribir), así que si cambia solo hay que tocar esos archivos. Las peticiones van espaciadas 0,4 s y con un `User-Agent` que se identifica honestamente.
+- **"Completar compra" llena el carrito, no compra nada.** Necesita conectar tu cuenta una vez con un token que se guarda solo en tu ordenador y caduca a las ~6 semanas. Si falla, la página te deja igualmente la lista con todos los productos enlazados. Detalles en [docs/08](docs/08-completar-la-compra.md).
+- **Las fotos de plato vienen de bancos de imágenes libres** (Wikipedia, Openverse, Commons) y no siempre aciertan. Las que no llegan a un mínimo de fiabilidad usan el collage de productos, y puedes cambiarlas tú en `/fotos`.
 - **Los valores nutricionales son orientativos.** Salen de tablas de composición de alimentos por ingrediente, no del producto concreto. Sirven para hacerse una idea; no es una herramienta médica.
 - **Los precios son los del día en que descargaste el catálogo.** La app siempre enseña esa fecha.
 - **El plan asume que compras todo de cero**, salvo que marques la casilla de "ya tengo la despensa en casa".

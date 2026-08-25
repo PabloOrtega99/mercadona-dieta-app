@@ -75,6 +75,7 @@ Los campos por bloques:
   "id": "lentejas_verduras",
   "nombre": "Lentejas con verduras",
   "dietas": ["equilibrada", "vegetariana", "vegana"],
+  "dificultad": "facil",
   "raciones": 4,
   "minutos": 55,
   "ingredientes": [
@@ -85,7 +86,10 @@ Los campos por bloques:
 }
 ```
 
-Tres cosas que conviene tener claras:
+Cuatro cosas que conviene tener claras:
+
+**`dificultad` es `facil`, `media` o `elaborada`**, y sirve para filtrar en la pantalla de selección. Si no lo pones, se deduce del tiempo, pero conviene ponerlo: **el tiempo no es lo mismo que la dificultad**. Estas lentejas tardan 55 minutos y son fáciles, porque consisten en echarlo todo a la olla y esperar. Una lasaña tarda parecido y tiene tres preparaciones distintas.
+
 
 **Los gramos son del TOTAL de la receta, no de una ración.** 350 g de lentejas para las 4 raciones, no para cada una.
 
@@ -184,6 +188,18 @@ Lo que comprueba:
 2. Que las etiquetas de dieta sean válidas y que esté `equilibrada`.
 3. **Que ninguna receta vegana lleve nada de origen animal.**
 4. Que toda receta vegana esté también marcada como vegetariana.
-5. Que cada dieta tenga al menos 8 recetas (con menos, los menús salen repetitivos).
+5. Que la dificultad sea una de las tres válidas.
+6. Que cada dieta tenga al menos 8 recetas (con menos, los menús salen repetitivos).
 
-Estado actual: **105 ingredientes y 60 recetas** — 60 para equilibrada, 23 altas en proteína, 28 vegetarianas y 16 veganas.
+Estado actual: **117 ingredientes y 130 recetas**.
+
+| Dieta | Recetas | | Dificultad | Recetas |
+|---|---|---|---|---|
+| Equilibrada | 130 | | Fácil | 67 |
+| Alta en proteína | 51 | | Media | 38 |
+| Vegetariana | 49 | | Elaborada | 25 |
+| Vegana | 25 | | | |
+
+Sobre las veganas: al ampliar el recetario se metieron a propósito recetas veganas **contundentes** (curry con leche de coco, guisos con legumbre y patata, salteados con anacardos y crema de cacahuete). En la versión anterior los planes veganos se quedaban en **1.630 kcal/día** con dinero de sobra, porque las 16 recetas veganas que había eran todas ligeras y el algoritmo no tenía con qué subir. Ahora ese mismo caso da **1.933 kcal/día**.
+
+Es un buen ejemplo de algo que conviene entender: **el algoritmo no puede arreglar un recetario pobre**. Si no hay recetas que alimenten, no las va a inventar.

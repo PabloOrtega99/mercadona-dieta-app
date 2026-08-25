@@ -25,6 +25,10 @@ pip install -r requirements.txt
 # antes de nada: sin él la app arranca pero solo muestra la página de error.
 python scripts/actualizar_catalogo.py
 
+# Buscar fotos de plato (~10 min, tres APIs externas). Opcional: sin esto
+# las recetas usan el collage de productos, que siempre funciona.
+python scripts/buscar_fotos.py --preseleccionar
+
 # Arrancar la web (http://localhost:8000). También: doble clic en arrancar.bat
 python -m app.web
 ```
@@ -68,11 +72,22 @@ API Mercadona ──> cliente.py ──> catalogo.py (SQLite, 4.304 productos)
                        emparejador.py │ (offline, se guarda en emparejamientos.json)
                                       ▼
 recetas.json ──> recetario.py ──> planificador.py ──> web.py ──> plantillas/
-                                      ▲
-                                 cesta.py (la matemática de envases)
+                                      ▲                  │
+                                 cesta.py                └──> carrito.py ──> API Mercadona
+                          (la matemática de envases)          (escribe, con token)
 ```
 
 `app/datos_app.py` carga todo de una vez y es la puerta de entrada para la web y los scripts. Lanza `ErrorPreparacion` con el comando exacto a ejecutar cuando falta un paso previo.
+
+### El flujo de la web: tres pasos, sin estado en el servidor
+
+```
+GET /  →  POST /elegir  →  POST /plan  →  POST /completar-compra
+```
+
+`/elegir` se llama a sí misma al pulsar "Actualizar" (lo distingue el campo oculto `recalcular`). **Todo el estado viaja en campos ocultos del formulario**, no en sesiones: sin estado que se desincronice, dos pestañas no se pisan y el botón "atrás" funciona.
+
+En `planificador.py`, `generar_plan()` es la unión de dos funciones que también se usan por separado: **`proponer_recetas()`** (el algoritmo) y **`construir_plan()`** (montar el resultado a partir de una selección ya decidida, venga del algoritmo o del usuario). Esa separación es lo que hace posible la pantalla de selección.
 
 ### `cesta.py`: envases, no gramos
 
@@ -114,6 +129,25 @@ Los términos de `busqueda` deben escribirse **con el vocabulario de Mercadona**
 
 `emparejamientos.json` guarda **solo ids de producto, nunca precios** — se consultan en el momento. El campo `"fijado": true` protege las correcciones manuales de la siguiente regeneración.
 
+### `carrito.py`: el único archivo que ESCRIBE en Mercadona
+
+`cliente.py` lee (catálogo público, sin autenticación). `carrito.py` escribe (requiere `Authorization: Bearer`, guardado en `datos/token_mercadona.json`, fuera de Git). Están separados a propósito: leer un catálogo y tocar la cuenta de alguien son riesgos distintos.
+
+**La forma exacta de la petición que añade líneas al carrito no se puede averiguar sin sesión iniciada** (hasta `OPTIONS` devuelve 401). El código prueba las combinaciones de `FORMATOS_PETICION` y, si ninguna funciona, muestra la respuesta literal del servidor. Ajustarlo es añadir una línea a esa lista. Ver `docs/08-completar-la-compra.md`.
+
+**El botón nunca se queda sin hacer nada**: sin token, con token caducado o si falla la petición, cae a una página con todos los productos enlazados y un botón de copiar. Degradar, no romperse.
+
+### `buscador.py`: fotos de plato
+
+Tres fuentes en orden: **Wikipedia (es)** → **Openverse** → **Wikimedia Commons**. Wikipedia acierta mucho más (la foto de un artículo la eligió una persona para ilustrar ese plato) pero **solo con consultas de dos palabras o más**: con una sola se va a la botánica y a la geografía.
+
+Dos reglas que costaron tres intentos y están explicadas en `docs/09-las-fotos-de-los-platos.md`:
+
+- **Nunca una consulta formada solo por palabras genéricas.** "crema de" o "ensalada" a secas devuelven cualquier cosa (la misma foto de un bizcocho acabó en cuatro recetas de crema).
+- **`GENERICAS` contiene solo palabras que NO identifican el plato.** Meter ahí "lasaña" o "paella" fue un error que dejó 82 de 130 recetas sin foto.
+
+Se **ordena** por relevancia pero no se descarta nada; quien exige `RELEVANCIA_MINIMA` es la preselección, no la búsqueda.
+
 ## Detalles que muerden
 
 - **`@dataclass(eq=False)` en `Receta`** es obligatorio: el planificador la usa como clave de diccionario, y el `__eq__` que genera dataclass por defecto la haría no hasheable.
@@ -121,7 +155,11 @@ Los términos de `busqueda` deben escribirse **con el vocabulario de Mercadona**
 - **Filtrado por dieta en dos sitios.** Las recetas se filtran en `generar_plan`, pero los básicos de desayuno son un camino independiente: `_gramos_de_basicos()` aplica el campo `alternativas` del JSON **y además** una comprobación final contra `vegano`/`vegetariano`. Un plan vegano llevaba leche por saltarse esto.
 - **Pillow debe ser ≥12** para tener wheels de Python 3.14; las versiones anteriores intentan compilar y fallan por falta de zlib.
 - **Encoding**: los scripts hacen `sys.stdout.reconfigure(encoding="utf-8")` porque en Windows, al redirigir la salida, Python usa una codificación que revienta con tildes.
-- **Educación con la API**: `PAUSA_ENTRE_PETICIONES = 0.4` y un `User-Agent` que se identifica honestamente. No quitar.
+- **Educación con las APIs**: `PAUSA_ENTRE_PETICIONES = 0.4` en Mercadona, `PAUSA = 0.4` en los bancos de imágenes, y `User-Agent` que se identifica honestamente en las cuatro. No quitar.
+- **El único JavaScript del proyecto** (`selector.js`) calcula las comidas cubiertas pero **no el precio**, a propósito: el precio depende del coste marginal y solo lo sabe el servidor. Un total aproximado en el navegador no cuadraría con el de la página siguiente.
+- **Al filtrar en el selector, las tarjetas se esconden con `display:none`, no se borran del DOM.** Un input escondido se sigue enviando; uno borrado, no. Borrarlas vaciaría media selección al filtrar.
+- **`revisada: true` en `imagenes_recetas.json`** protege las fotos que eligió una persona de la siguiente pasada del preseleccionador. Misma idea que `"fijado": true` en los emparejamientos.
+- **Al cambiar la foto de una receta hay que borrar `datos/imagenes/plato_<id>.jpg`.** Si no, se sigue viendo la vieja y parece que el cambio no funciona.
 
 ## Ajustes
 

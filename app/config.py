@@ -32,6 +32,11 @@ ARCHIVO_INGREDIENTES = DIR_DATOS / "ingredientes.json"
 ARCHIVO_RECETAS = DIR_DATOS / "recetas.json"
 ARCHIVO_EMPAREJAMIENTOS = DIR_DATOS / "emparejamientos.json"
 ARCHIVO_BASICOS = DIR_DATOS / "basicos_desayuno.json"
+ARCHIVO_IMAGENES = DIR_DATOS / "imagenes_recetas.json"
+
+# Las fotos candidatas que devuelven los bancos de imagenes. Esto SÍ es
+# regenerable (basta con volver a buscar), así que vive con lo generado.
+ARCHIVO_CANDIDATAS = DIR_DATOS_GENERADOS / "candidatas_fotos.json"
 
 
 # ---------------------------------------------------------------------------

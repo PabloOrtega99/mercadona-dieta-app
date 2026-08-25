@@ -15,7 +15,8 @@
 
 {# method="post" envia los datos sin que aparezcan en la direccion.
    action dice a que ruta de web.py se envian: la funcion generar(). #}
-<form class="tarjeta formulario" method="post" action="{{ url_for('generar') }}">
+{# Va a /elegir, no a /plan: ahora hay un paso intermedio para elegir recetas. #}
+<form class="tarjeta formulario" method="post" action="{{ url_for('elegir') }}">
 
   <div class="campos">
 
@@ -92,7 +93,7 @@
     </span>
   </label>
 
-  <button type="submit" class="boton-principal">Generar mi menú y mi lista</button>
+  <button type="submit" class="boton-principal">Ver recetas y generar mi lista</button>
 
 </form>
 

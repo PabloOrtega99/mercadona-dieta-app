@@ -135,49 +135,30 @@ class Contexto:
         return cesta
 
 
-def generar_plan(
-    presupuesto: float,
+def preparar_contexto(
     semanas: int,
     personas: int,
     dieta: str,
     ingredientes: dict[str, Ingrediente],
-    recetas: dict[str, Receta],
     emparejamientos: dict[str, dict],
     productos: dict[str, dict],
     basicos: list[dict],
     con_desayunos: bool = True,
     despensa_en_casa: bool = False,
-) -> Plan:
-    """Genera el plan completo. Es la funcion que llama la web."""
+) -> Contexto:
+    """Monta el Contexto, incluidos los gramos de desayuno del periodo.
 
-    plan = Plan(
-        presupuesto=presupuesto,
-        semanas=semanas,
-        personas=personas,
-        dieta=dieta,
-        con_desayunos=con_desayunos,
-        despensa_en_casa=despensa_en_casa,
-    )
-
-    # --- Paso 1: cuantas raciones hacen falta ------------------------------
-    # 14 comidas por semana x semanas x personas.
-    raciones_objetivo = config.COMIDAS_POR_SEMANA * semanas * personas
-
-    # --- Paso 2: que recetas valen -----------------------------------------
-    candidatas = [receta for receta in recetas.values() if receta.vale_para(dieta)]
-    if not candidatas:
-        return plan  # sin recetas para esa dieta no hay nada que hacer
-
-    # Los desayunos son un gasto fijo: no dependen de las recetas que elijas,
-    # pero sí se comen parte del presupuesto. Los metemos primero para que el
-    # algoritmo trabaje con el dinero que queda de verdad.
+    Los desayunos son un gasto fijo: no dependen de las recetas que elijas,
+    pero si se comen parte del presupuesto. Van dentro del contexto para que
+    cualquier cesta que se monte los lleve ya puestos y el algoritmo trabaje
+    con el dinero que queda de verdad.
+    """
     gramos_basicos = (
         _gramos_de_basicos(basicos, semanas, personas, dieta, ingredientes)
         if con_desayunos
         else {}
     )
-
-    contexto = Contexto(
+    return Contexto(
         ingredientes=ingredientes,
         emparejamientos=emparejamientos,
         productos=productos,
@@ -185,10 +166,35 @@ def generar_plan(
         despensa_en_casa=despensa_en_casa,
     )
 
-    # --- Paso 3: el bucle voraz --------------------------------------------
+
+def proponer_recetas(
+    presupuesto: float,
+    semanas: int,
+    personas: int,
+    dieta: str,
+    recetas: dict[str, Receta],
+    contexto: Contexto,
+) -> dict[Receta, int]:
+    """Elige que recetas cocinar y cuantas veces. Devuelve {receta: veces}.
+
+    Aqui vive el algoritmo entero: el bucle voraz y la escalada posterior.
+    Antes esto estaba pegado a la construccion del resultado dentro de
+    generar_plan(). Se separo para que la pantalla de seleccion pueda pedir
+    una propuesta, dejar que el usuario la cambie, y luego construir el plan
+    con lo que el haya decidido. Sin esta separacion habria que duplicar medio
+    planificador.
+    """
+    # Cuántas raciones hacen falta: 14 comidas por semana x semanas x personas.
+    raciones_objetivo = config.COMIDAS_POR_SEMANA * semanas * personas
+
+    candidatas = [receta for receta in recetas.values() if receta.vale_para(dieta)]
+    if not candidatas:
+        return {}
+
+    # --- El bucle voraz ----------------------------------------------------
     seleccion = _elegir_recetas(candidatas, raciones_objetivo, presupuesto, contexto)
 
-    # --- Paso 4: ajustar al presupuesto ------------------------------------
+    # --- Ajustar al presupuesto --------------------------------------------
     # Según de qué lado del presupuesto hayamos caído, toca una cosa o la otra.
     coste = _construir_cesta(seleccion, contexto).coste_total()
 
@@ -206,7 +212,36 @@ def generar_plan(
             seleccion, candidatas, presupuesto, contexto, kcal_objetivo
         )
 
-    # --- Recomponer el resultado -------------------------------------------
+    return seleccion
+
+
+def construir_plan(
+    seleccion: dict[Receta, int],
+    presupuesto: float,
+    semanas: int,
+    personas: int,
+    dieta: str,
+    contexto: Contexto,
+    con_desayunos: bool = True,
+) -> Plan:
+    """Monta el Plan completo a partir de una seleccion de recetas ya decidida.
+
+    No elige nada: recibe las recetas hechas y calcula la cesta, la lista de la
+    compra, el menu por dias, la nutricion y los avisos.
+
+    La seleccion puede venir de proponer_recetas() o directamente del usuario
+    desde la pantalla de seleccion. A esta funcion le da igual de donde salga,
+    y eso es justamente lo que la hace util.
+    """
+    plan = Plan(
+        presupuesto=presupuesto,
+        semanas=semanas,
+        personas=personas,
+        dieta=dieta,
+        con_desayunos=con_desayunos,
+        despensa_en_casa=contexto.despensa_en_casa,
+    )
+
     cesta = _construir_cesta(seleccion, contexto)
 
     plan.elegidas = sorted(
@@ -226,9 +261,58 @@ def generar_plan(
     ]
 
     plan.menu = _repartir_menu(seleccion, semanas, personas)
-    _calcular_nutricion(plan, seleccion, ingredientes, gramos_basicos)
+    _calcular_nutricion(plan, seleccion, contexto.ingredientes, contexto.gramos_basicos)
 
     return plan
+
+
+def generar_plan(
+    presupuesto: float,
+    semanas: int,
+    personas: int,
+    dieta: str,
+    ingredientes: dict[str, Ingrediente],
+    recetas: dict[str, Receta],
+    emparejamientos: dict[str, dict],
+    productos: dict[str, dict],
+    basicos: list[dict],
+    con_desayunos: bool = True,
+    despensa_en_casa: bool = False,
+) -> Plan:
+    """Propone recetas y monta el plan de una tacada.
+
+    Es el camino de siempre: el que usa scripts/probar_plan.py y el que se
+    usaba en la web antes de que existiera la pantalla de seleccion. Ahora
+    no es mas que juntar las dos piezas de arriba.
+    """
+    contexto = preparar_contexto(
+        semanas=semanas,
+        personas=personas,
+        dieta=dieta,
+        ingredientes=ingredientes,
+        emparejamientos=emparejamientos,
+        productos=productos,
+        basicos=basicos,
+        con_desayunos=con_desayunos,
+        despensa_en_casa=despensa_en_casa,
+    )
+    seleccion = proponer_recetas(
+        presupuesto=presupuesto,
+        semanas=semanas,
+        personas=personas,
+        dieta=dieta,
+        recetas=recetas,
+        contexto=contexto,
+    )
+    return construir_plan(
+        seleccion=seleccion,
+        presupuesto=presupuesto,
+        semanas=semanas,
+        personas=personas,
+        dieta=dieta,
+        contexto=contexto,
+        con_desayunos=con_desayunos,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -512,36 +596,60 @@ def _abaratar(
                 if entra is sale or entra.raciones < sale.raciones:
                     continue
 
-                diferencia = dict(_gramos_de_receta(entra))
-                for id_ingrediente, gramos in _gramos_de_receta(sale).items():
-                    diferencia[id_ingrediente] = diferencia.get(id_ingrediente, 0.0) - gramos
-
-                ahorro = -cesta.coste_marginal(diferencia)
-                if ahorro > mejor_ahorro:
-                    mejor = (sale, entra, diferencia)
-                    mejor_ahorro = ahorro
+                # Se prueban DOS tipos de cambio, y esto es importante:
+                #   1  = cambiar una sola cocinada
+                #   todas = cambiar TODAS las cocinadas de esa receta de golpe
+                #
+                # Sin el segundo, el algoritmo se queda atrapado. Paso de
+                # verdad: con un presupuesto imposible se planto en catorce
+                # cocinadas de la misma ensalada de surimi, que salia por
+                # 92 euros. Cambiar UNA sola no bajaba el precio (los envases
+                # seguian haciendo falta para las otras trece) y ademas obligaba
+                # a comprar los de la receta nueva, asi que ningun cambio
+                # mejoraba y se quedaba ahi. Es el clasico maximo local: para
+                # salir hay que dar un paso grande, no muchos pequenos.
+                for cuantas in {1, seleccion[sale]}:
+                    diferencia = _diferencia_de_cambio(sale, entra, cuantas)
+                    ahorro = -cesta.coste_marginal(diferencia)
+                    if ahorro > mejor_ahorro:
+                        mejor = (sale, entra, cuantas, diferencia)
+                        mejor_ahorro = ahorro
 
         # Un céntimo de mejora no compensa seguir dando vueltas.
         if mejor is None or mejor_ahorro < 0.01:
             break
 
-        sale, entra, diferencia = mejor
-        seleccion = _aplicar_cambio(seleccion, sale, entra)
+        sale, entra, cuantas, diferencia = mejor
+        seleccion = _aplicar_cambio(seleccion, sale, entra, cuantas)
         cesta.anadir(diferencia)
         coste_actual = cesta.coste_total()
 
     return seleccion
 
 
+def _diferencia_de_cambio(sale: Receta, entra: Receta, cuantas: int) -> dict[str, float]:
+    """Los gramos que cambian al sustituir N cocinadas de una receta por otra.
+
+    Los de la que sale van en negativo y los de la que entra en positivo, que
+    es justo lo que espera Cesta.coste_marginal().
+    """
+    diferencia: dict[str, float] = {}
+    for id_ingrediente, gramos in _gramos_de_receta(entra).items():
+        diferencia[id_ingrediente] = diferencia.get(id_ingrediente, 0.0) + gramos * cuantas
+    for id_ingrediente, gramos in _gramos_de_receta(sale).items():
+        diferencia[id_ingrediente] = diferencia.get(id_ingrediente, 0.0) - gramos * cuantas
+    return diferencia
+
+
 def _aplicar_cambio(
-    seleccion: dict[Receta, int], sale: Receta, entra: Receta
+    seleccion: dict[Receta, int], sale: Receta, entra: Receta, cuantas: int = 1
 ) -> dict[Receta, int]:
-    """Devuelve una seleccion nueva con una cocinada de 'sale' cambiada por 'entra'."""
+    """Devuelve una seleccion nueva con N cocinadas de 'sale' cambiadas por 'entra'."""
     propuesta = dict(seleccion)
-    propuesta[sale] -= 1
-    if propuesta[sale] == 0:
+    propuesta[sale] -= cuantas
+    if propuesta[sale] <= 0:
         del propuesta[sale]
-    propuesta[entra] = propuesta.get(entra, 0) + 1
+    propuesta[entra] = propuesta.get(entra, 0) + cuantas
     return propuesta
 
 
@@ -699,6 +807,17 @@ def _gramos_de_basicos(
     return aportes
 
 
+def cesta_de(seleccion: dict[Receta, int], contexto: Contexto) -> Cesta:
+    """Monta la cesta de una seleccion de recetas. Version publica.
+
+    La usa la pantalla de seleccion para saber cuanto cuesta lo que llevas
+    marcado sin tener que construir el plan entero. El guion bajo de
+    _construir_cesta significa "de uso interno", asi que se le pone esta puerta
+    en vez de que la web tenga que entrar por detras.
+    """
+    return _construir_cesta(seleccion, contexto)
+
+
 def _construir_cesta(seleccion: dict[Receta, int], contexto: Contexto) -> Cesta:
     """Monta una cesta desde cero a partir de una seleccion de recetas."""
     cesta = contexto.cesta_vacia()
@@ -717,3 +836,28 @@ def precalcular_calorias(recetas: dict[str, Receta], ingredientes: dict[str, Ing
     """
     for receta in recetas.values():
         receta._kcal_racion_cache = receta.macros_por_racion(ingredientes)["kcal"]
+
+
+def precalcular_costes(
+    recetas: dict[str, Receta],
+    ingredientes: dict[str, Ingrediente],
+    emparejamientos: dict[str, dict],
+    productos: dict[str, dict],
+) -> None:
+    """Calcula lo que cuesta cada receta COCINADA ELLA SOLA, por racion.
+
+    Es el precio que se ensena en la pantalla de seleccion, para poder comparar
+    recetas de un vistazo.
+
+    OJO, y esto hay que tenerlo claro para no confundirse mas adelante: NO es
+    lo que va a costar dentro del plan. Dentro del plan casi siempre sale mas
+    barata, porque comparte envases con las demas (el aceite, la cebolla, el
+    arroz...). Eso es el coste marginal, y solo se puede calcular sabiendo que
+    otras recetas la acompanian. Ver cesta.py.
+
+    Por eso en la pantalla se etiqueta explicitamente como "por si sola".
+    """
+    for receta in recetas.values():
+        cesta = Cesta(ingredientes, emparejamientos, productos)
+        cesta.anadir(_gramos_de_receta(receta))
+        receta._coste_racion_cache = cesta.coste_total() / max(1, receta.raciones)

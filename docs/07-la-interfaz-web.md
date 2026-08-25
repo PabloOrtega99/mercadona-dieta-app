@@ -52,10 +52,15 @@ Las rutas de la app:
 
 | Dirección | Qué hace |
 |---|---|
-| `GET /` | El formulario |
-| `POST /plan` | Recibe el formulario, calcula el plan y lo enseña |
+| `GET /` | El formulario: presupuesto, semanas, dieta, personas |
+| `POST /elegir` | **Paso 2**: propuesta de recetas para que la retoques |
+| `POST /plan` | **Paso 3**: el plan con las recetas que elegiste |
 | `GET /receta/<id>` | La ficha de una receta |
-| `GET /receta/<id>/imagen.png` | El collage de esa receta |
+| `GET /receta/<id>/imagen.png` | La foto del plato (o el collage) |
+| `GET /fotos` | Pantalla para revisar las fotos de las recetas |
+| `POST /fotos/elegir` | Guarda la foto elegida para una receta |
+| `GET/POST /carrito/token` | Conectar con tu cuenta de Mercadona |
+| `POST /completar-compra` | Mete la lista en tu carrito de la tienda online |
 | `GET /recargar` | Vuelve a leer los JSON sin reiniciar el servidor |
 
 ### GET y POST
@@ -64,6 +69,42 @@ Las rutas de la app:
 - **POST** = "toma estos datos". Van en el cuerpo de la petición, sin verse.
 
 El formulario usa POST porque envía varios campos y quedaría feo en la barra de direcciones.
+
+### El flujo de tres pasos y cómo se recuerda lo elegido
+
+```
+  GET  /            presupuesto, semanas, dieta, personas
+         │
+         ▼
+  POST /elegir      ← el algoritmo propone y tú retocas
+         │              (se llama a sí misma al pulsar "Actualizar")
+         ▼
+  POST /plan        el plan definitivo con TUS recetas
+```
+
+Hay que arrastrar información de una pantalla a otra: lo que pediste en el formulario, y luego las recetas que marcaste. Se hace con **campos ocultos** (`<input type="hidden">`), no con sesiones ni cookies:
+
+- El servidor no guarda nada entre peticiones, así que no hay estado que se desincronice ni que caduque.
+- Puedes abrir dos pestañas con dos planes distintos y no se pisan.
+- El botón "atrás" del navegador se comporta como esperas.
+
+El precio es que la información viaja en cada envío. Con cuatro números y unas pocas recetas marcadas, es irrelevante.
+
+Un truco de la plantilla: **un solo formulario con dos botones que van a rutas distintas**, gracias al atributo `formaction`. "Actualizar" vuelve a `/elegir`; "Ver mi plan" va a `/plan`.
+
+### El único JavaScript del proyecto, y lo que a propósito NO hace
+
+[`estaticos/selector.js`](../app/estaticos/selector.js) hace dos cosas: llevar la cuenta de las comidas cubiertas y esconder tarjetas al filtrar.
+
+Lo interesante es lo que **no** hace: **no calcula el precio**.
+
+Sería lo primero que uno pensaría en poner ahí. Pero el precio real depende del **coste marginal** (si dos recetas llevan cebolla, la segunda no paga cebolla), y eso solo lo sabe el servidor. Enseñar una suma aproximada en el navegador daría un número que **no cuadra** con el de la pantalla siguiente.
+
+Y ese error exacto —dos cifras distintas para la misma cosa— ya costó un rediseño en la primera versión de la app (está contado en [`config.py`](../app/config.py)). Cuando el usuario suma y no le sale, deja de fiarse de todos los demás números de la página.
+
+Así que el precio se recalcula en el servidor con el botón "Actualizar", y en el navegador solo se enseña lo que se puede calcular **exacto**: las comidas, que son raciones dividido entre personas.
+
+> Detalle relacionado: al filtrar, las tarjetas se esconden con `display: none`, **no se borran del documento**. Un `<input>` escondido se sigue enviando; uno borrado, no. Si las borráramos, filtrar por "menos de 25 minutos" te vaciaría media selección sin avisar.
 
 ### `/recargar`, que parece una tontería y no lo es
 
@@ -133,9 +174,16 @@ Lo mismo con la dieta: si llega una que no existe en nuestra lista, se usa "equi
 
 ---
 
-## 5. Los collages de las recetas
+## 5. Las imágenes de las recetas
 
-**El problema**: el recetario es nuestro, así que no tenemos fotos de los platos. Buscar 60 fotos con licencia libre sería un trabajo aburrido y los enlaces acabarían rompiéndose.
+Hay dos mecanismos, y el segundo es la red de seguridad del primero:
+
+1. **Foto del plato**, buscada en bancos de imágenes libres. Es lo que se ve normalmente. Tiene su propio documento: [`09-las-fotos-de-los-platos.md`](09-las-fotos-de-los-platos.md).
+2. **Collage de productos**, si la receta no tiene foto elegida. Nunca hay un hueco roto.
+
+### El collage, que sigue ahí
+
+**El problema original**: el recetario es nuestro, así que no tenemos fotos de los platos.
 
 **La solución**: la API de Mercadona **sí** nos da una foto de cada producto. Así que cogemos las fotos de los ingredientes principales y montamos un mosaico 2×2.
 

@@ -26,6 +26,15 @@ NOMBRES_DIETAS = {
     "vegana": "Vegana",
 }
 
+# Niveles de dificultad, de menos a más.
+DIFICULTADES = ("facil", "media", "elaborada")
+
+NOMBRES_DIFICULTAD = {
+    "facil": "Fácil",
+    "media": "Media",
+    "elaborada": "Elaborada",
+}
+
 
 # ---------------------------------------------------------------------------
 # LAS "CAJAS" DE DATOS
@@ -90,12 +99,17 @@ class Receta:
     dietas: list[str]
     raciones: int
     minutos: int
+    dificultad: str = "media"
     ingredientes: list[IngredienteDeReceta] = field(default_factory=list)
     pasos: list[str] = field(default_factory=list)
 
     def vale_para(self, dieta: str) -> bool:
         """¿Sirve esta receta para la dieta pedida?"""
         return dieta in self.dietas
+
+    @property
+    def nombre_dificultad(self) -> str:
+        return NOMBRES_DIFICULTAD.get(self.dificultad, self.dificultad)
 
     def macros_por_racion(self, ingredientes: dict[str, Ingrediente]) -> dict:
         """Calcula kcal y macronutrientes de UNA ración.
@@ -174,12 +188,15 @@ def cargar_recetas() -> dict[str, Receta]:
         if identificador in recetas:
             raise ErrorDatos(f"La receta '{identificador}' esta repetida en recetas.json")
 
+        minutos = int(bruto.get("minutos", 30))
+
         recetas[identificador] = Receta(
             id=identificador,
             nombre=bruto["nombre"],
             dietas=list(bruto.get("dietas", [])),
             raciones=int(bruto.get("raciones", 4)),
-            minutos=int(bruto.get("minutos", 30)),
+            minutos=minutos,
+            dificultad=bruto.get("dificultad") or _dificultad_por_tiempo(minutos),
             ingredientes=[
                 IngredienteDeReceta(id=item["id"], gramos=float(item["gramos"]))
                 for item in bruto.get("ingredientes", [])
@@ -191,6 +208,22 @@ def cargar_recetas() -> dict[str, Receta]:
         raise ErrorDatos("recetas.json no tiene ninguna receta")
 
     return recetas
+
+
+def _dificultad_por_tiempo(minutos: int) -> str:
+    """Deduce la dificultad a partir del tiempo, si la receta no la trae puesta.
+
+    Es solo un valor por defecto razonable para no obligar a rellenar el campo
+    en las recetas antiguas. El tiempo NO es lo mismo que la dificultad: un
+    guiso de 55 minutos que consiste en echarlo todo a la olla y esperar es
+    facil, aunque tarde. Por eso conviene poner "dificultad" a mano cuando el
+    tiempo enganie, y por eso el campo del JSON manda sobre esta funcion.
+    """
+    if minutos < 25:
+        return "facil"
+    if minutos <= 50:
+        return "media"
+    return "elaborada"
 
 
 def cargar_basicos() -> list[dict]:
@@ -259,6 +292,12 @@ def comprobar(ingredientes: dict[str, Ingrediente], recetas: dict[str, Receta]) 
                 problemas.append(
                     f"[{receta.id}] tiene la dieta '{dieta}', que no existe. Validas: {', '.join(DIETAS)}"
                 )
+        if receta.dificultad not in DIFICULTADES:
+            problemas.append(
+                f"[{receta.id}] tiene dificultad '{receta.dificultad}', que no existe. "
+                f"Validas: {', '.join(DIFICULTADES)}"
+            )
+
         if "equilibrada" not in receta.dietas:
             problemas.append(
                 f"[{receta.id}] no incluye 'equilibrada'. La dieta equilibrada no restringe nada, "

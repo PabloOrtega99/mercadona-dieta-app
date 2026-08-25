@@ -1,0 +1,112 @@
+{# Resultado de "Completar compra".
+
+   Tenga exito o no, esta pagina SIEMPRE ensena la lista con todos los
+   productos enlazados. Asi, si la parte automatica falla, sigue siendo util:
+   abres los enlaces y los vas anadiendo tu. Degradar, no romperse. #}
+{% extends "base.html" %}
+
+{% block titulo %}Completar la compra en Mercadona{% endblock %}
+
+{% block contenido %}
+
+{% if resultado %}
+
+  <section class="portada">
+    <h1>Listo: {{ resultado.anadidos }} productos en tu carrito</h1>
+    <p class="subtitulo">
+      Ya están en tu cesta de la tienda online, por un total aproximado de
+      {{ total | euros }}.
+    </p>
+  </section>
+
+  <p class="aviso aviso-ok">
+    <strong>No se ha comprado nada.</strong> Ahora entra en Mercadona, revisa
+    la cesta, cambia lo que quieras y haz el pedido tú.
+  </p>
+
+  <p style="margin: 1.5rem 0;">
+    <a class="boton-principal boton-estrecho" href="https://tienda.mercadona.es/checkout"
+       target="_blank" rel="noopener">Abrir mi carrito en Mercadona →</a>
+  </p>
+
+{% else %}
+
+  <section class="portada">
+    <h1>No he podido llenar el carrito</h1>
+    <p class="subtitulo">
+      Pero la lista sigue aquí abajo con todos los productos enlazados, así que
+      puedes añadirlos tú en un par de minutos.
+    </p>
+  </section>
+
+  <p class="aviso aviso-error" style="white-space: pre-wrap;">{{ error }}</p>
+
+  {% if not estado.valido %}
+    <p style="margin: 1.25rem 0;">
+      <a class="boton-principal boton-estrecho" href="{{ url_for('configurar_token') }}">
+        Conectar con mi cuenta de Mercadona →
+      </a>
+    </p>
+  {% endif %}
+
+{% endif %}
+
+<section class="bloque">
+  <div class="bloque-cabecera">
+    <h2>Tu lista, producto a producto</h2>
+    <button class="boton-secundario" id="copiar-lista">Copiar la lista</button>
+  </div>
+  <p class="bloque-ayuda">
+    Cada nombre lleva a su página en Mercadona. Se abren en otra pestaña.
+  </p>
+
+  <ul class="lista-compra" id="lista-productos">
+    {% for linea in lineas %}
+      <li class="linea-compra">
+        <div class="linea-texto">
+          <strong>
+            <a class="enlace-producto"
+               href="https://tienda.mercadona.es/product/{{ linea.id }}"
+               target="_blank" rel="noopener">{{ linea.nombre or linea.id }}</a>
+          </strong>
+        </div>
+        <div class="linea-numeros">
+          <span class="unidades">{{ linea.unidades }} ud</span>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<p class="volver">
+  <a class="boton-secundario" href="{{ url_for('inicio') }}">← Empezar otro plan</a>
+</p>
+
+<script>
+  // Copiar la lista al portapapeles, por si prefieres tenerla en el movil.
+  document.getElementById("copiar-lista").addEventListener("click", function () {
+    var texto = Array.prototype.map.call(
+      document.querySelectorAll("#lista-productos li"),
+      function (li) {
+        var nombre = li.querySelector("strong").textContent.trim();
+        var uds = li.querySelector(".unidades").textContent.trim();
+        return uds + "  " + nombre;
+      }
+    ).join("\n");
+
+    // navigator.clipboard solo existe en paginas seguras (https o localhost).
+    // Como esto corre en localhost, funciona; pero se comprueba igualmente
+    // para no dejar un boton que falla en silencio.
+    var boton = this;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(texto).then(function () {
+        boton.textContent = "¡Copiada!";
+        setTimeout(function () { boton.textContent = "Copiar la lista"; }, 2000);
+      });
+    } else {
+      window.prompt("Copia la lista con Ctrl+C:", texto);
+    }
+  });
+</script>
+
+{% endblock %}

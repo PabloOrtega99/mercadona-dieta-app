@@ -1,0 +1,83 @@
+{# Pantalla para pegar el token de la sesion de Mercadona. #}
+{% extends "base.html" %}
+
+{% block titulo %}Conectar con mi cuenta de Mercadona{% endblock %}
+
+{% block contenido %}
+
+<section class="portada">
+  <h1>Conectar con tu cuenta de Mercadona</h1>
+  <p class="subtitulo">
+    Esto sirve para que el botón <strong>Completar compra</strong> pueda meter
+    la lista en tu carrito de la tienda online.
+  </p>
+</section>
+
+<p class="aviso aviso-info">
+  <strong>Llena el carrito, no compra nada.</strong> Después tienes que entrar
+  en Mercadona, revisar la cesta y pagar tú. Esta aplicación no puede hacer
+  pedidos ni pagar.
+</p>
+
+{% if mensaje %}
+  <p class="aviso {{ 'aviso-ok' if mensaje[0] == 'ok' else 'aviso-error' }}">{{ mensaje[1] }}</p>
+{% endif %}
+
+<div class="tarjeta">
+  <h2>Estado actual</h2>
+  <p class="{{ 'texto-ok' if estado.valido else 'texto-error' }}">{{ estado.mensaje }}</p>
+  {% if estado.valido and estado.dias_restantes is not none %}
+    <p class="letra-pequena">
+      Te quedan unos <strong>{{ estado.dias_restantes }} días</strong>. Cuando caduque,
+      vuelve aquí y repite el proceso: son dos minutos.
+    </p>
+  {% endif %}
+</div>
+
+<div class="tarjeta" style="margin-top: 1.25rem;">
+  <h2>Cómo conseguir el token</h2>
+  <ol class="lista-pasos">
+    <li>Abre <a href="https://tienda.mercadona.es" target="_blank" rel="noopener">tienda.mercadona.es</a>
+        e <strong>inicia sesión</strong> con tu cuenta.</li>
+    <li>Pulsa <strong>F12</strong> para abrir las herramientas del navegador y ve a
+        la pestaña <strong>Red</strong> (o <em>Network</em>).</li>
+    <li>Haz cualquier cosa en la web, por ejemplo buscar un producto. Verás que
+        aparecen líneas en la lista.</li>
+    <li>Pincha en cualquiera de esas líneas y busca, en <strong>Cabeceras de solicitud</strong>,
+        una que ponga:
+        <br><code>Authorization: Bearer eyJhbGciOi...</code></li>
+    <li>Copia ese texto entero y pégalo aquí abajo. Da igual si copias también
+        el <code>Authorization:</code> o el <code>Bearer</code>: eso se quita solo.</li>
+  </ol>
+  <p class="letra-pequena">
+    Guía con más detalle y qué hacer si algo no cuadra:
+    <code>docs/08-completar-la-compra.md</code>
+  </p>
+</div>
+
+<form class="tarjeta" method="post" style="margin-top: 1.25rem;">
+  <div class="campo">
+    <label for="token">Pega aquí el token</label>
+    <textarea id="token" name="token" rows="4" class="campo-texto"
+              placeholder="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></textarea>
+    <p class="ayuda">
+      Se guarda solo en tu ordenador, en <code>datos/token_mercadona.json</code>.
+      Esa carpeta está en <code>.gitignore</code>, así que no puede subirse a
+      GitHub ni por accidente.
+    </p>
+  </div>
+  <button type="submit" class="boton-principal">Guardar y comprobar</button>
+</form>
+
+{% if estado.hay_token %}
+  <form method="post" style="margin-top: 1rem;">
+    <input type="hidden" name="accion" value="borrar">
+    <button type="submit" class="boton-secundario">Borrar el token guardado</button>
+  </form>
+{% endif %}
+
+<p class="volver">
+  <a class="boton-secundario" href="{{ url_for('inicio') }}">← Volver al inicio</a>
+</p>
+
+{% endblock %}

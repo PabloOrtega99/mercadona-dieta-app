@@ -445,6 +445,13 @@ main { padding: 2rem 0 3rem; }
   text-transform: uppercase;
 }
 .subtotal { font-size: 1rem; font-variant-numeric: tabular-nums; }
+
+/* El enlace al producto en Mercadona. Se pinta como texto normal y solo se
+   subraya al pasar por encima: en una lista de 35 productos, 35 enlaces
+   azules subrayados serían ilegibles. */
+.enlace-producto { color: inherit; text-decoration: none; }
+.enlace-producto:hover { color: var(--verde-oscuro); text-decoration: underline; }
+a.enlace-producto:hover .foto-producto { border-color: var(--verde); }
 .subtotal-nocuenta { text-decoration: line-through; color: var(--tinta-tenue); font-weight: 500; }
 .total-final small { font-size: .8rem; opacity: .7; font-weight: 400; }
 
@@ -461,6 +468,22 @@ main { padding: 2rem 0 3rem; }
   font-size: 1.05rem;
 }
 .total-final strong { font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+
+.completar { margin-top: 1.25rem; text-align: center; }
+.completar .ayuda { margin-top: .6rem; }
+
+.campo-texto {
+  width: 100%;
+  padding: .7rem .8rem;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: .85rem;
+  color: var(--tinta);
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 9px;
+  resize: vertical;
+}
+.campo-texto:focus { outline: 2px solid var(--verde); border-color: var(--verde); }
 
 /* --- Nutricion --- */
 .nutricion {
@@ -545,6 +568,210 @@ main { padding: 2rem 0 3rem; }
   margin-bottom: 1.5rem;
 }
 
+/* --- Pantalla de eleccion de recetas (paso 2) --- */
+
+.texto-error { color: var(--rojo); }
+.texto-ok { color: var(--verde-oscuro); }
+.oculta { display: none !important; }
+
+/* La barra de resumen se queda pegada arriba al hacer scroll. El "top" tiene
+   que ser la altura de la cabecera, que tambien es sticky, o se solaparian. */
+.barra-seleccion {
+  position: sticky;
+  top: 60px;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  padding: .9rem 1.25rem;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+.barra-dato { display: flex; flex-direction: column; }
+.barra-dato .ayuda { margin: 0; }
+/* margin-left:auto empuja los botones al extremo derecho de la barra. */
+.barra-botones { margin-left: auto; display: flex; gap: .6rem; }
+.boton-estrecho { width: auto; padding: .6rem 1.1rem; font-size: .92rem; }
+
+.filtros {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  font-size: .87rem;
+  color: var(--tinta-suave);
+}
+.filtros label { display: flex; align-items: center; gap: .45rem; }
+.filtros select {
+  padding: .35rem .5rem;
+  font-family: inherit;
+  font-size: .87rem;
+  border: 1px solid var(--linea);
+  border-radius: 7px;
+  background: var(--papel);
+  color: var(--tinta);
+}
+.casilla-simple { cursor: pointer; }
+.casilla-simple input { accent-color: var(--verde); }
+.filtros-cuenta { margin-left: auto; color: var(--tinta-tenue); }
+
+.rejilla-elegir {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+  gap: 1rem;
+}
+
+.tarjeta-elegir {
+  display: block;
+  position: relative;
+  background: var(--papel);
+  border: 2px solid var(--linea);
+  border-radius: var(--radio);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .12s, box-shadow .12s;
+}
+.tarjeta-elegir:hover { border-color: var(--tinta-tenue); }
+.tarjeta-elegir.elegida { border-color: var(--verde); box-shadow: var(--sombra); }
+
+/* La casilla se ve, arriba a la izquierda, sobre la foto: es la senal de que
+   la tarjeta se puede marcar. No se esconde como en las tarjetas de dieta
+   porque aqui hay 130 y conviene que se vea de un vistazo cual esta marcada. */
+.tarjeta-elegir .casilla-receta {
+  position: absolute;
+  top: .6rem;
+  left: .6rem;
+  z-index: 2;
+  width: 22px;
+  height: 22px;
+  accent-color: var(--verde);
+  cursor: pointer;
+  box-shadow: 0 0 0 3px var(--papel);
+  border-radius: 4px;
+}
+.tarjeta-elegir img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  background: var(--fondo);
+}
+.tarjeta-elegir-cuerpo { padding: .7rem .85rem .85rem; }
+.tarjeta-elegir h3 { font-size: .95rem; margin: 0 0 .35rem; }
+.tarjeta-elegir-datos { font-size: .78rem; color: var(--tinta-tenue); margin: 0 0 .2rem; }
+.tarjeta-elegir-cifras { font-size: .78rem; color: var(--tinta-suave); margin: 0 0 .6rem; }
+
+.pastilla {
+  display: inline-block;
+  font-size: .7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  padding: .1rem .4rem;
+  border-radius: 4px;
+  margin-right: .2rem;
+}
+.pastilla-facil { background: var(--verde-claro); color: var(--verde-oscuro); }
+.pastilla-media { background: #eef1f5; color: var(--tinta-suave); }
+.pastilla-elaborada { background: var(--ambar-claro); color: var(--ambar); }
+
+.tarjeta-elegir-pie {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding-top: .6rem;
+  border-top: 1px solid var(--linea);
+  font-size: .78rem;
+  color: var(--tinta-tenue);
+}
+.selector-veces {
+  padding: .2rem .3rem;
+  font-family: inherit;
+  font-size: .78rem;
+  border: 1px solid var(--linea);
+  border-radius: 6px;
+  background: var(--papel);
+  color: var(--tinta);
+}
+.enlace-ficha { margin-left: auto; font-size: .78rem; }
+
+.sin-resultados {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--tinta-tenue);
+}
+
+/* --- Pantalla de revision de fotos --- */
+
+.fila-foto {
+  padding: 1.25rem 0 1.5rem;
+  border-bottom: 1px solid var(--linea);
+  /* scroll-margin-top separa el elemento del borde superior al llegar por un
+     ancla (#receta-xxx). Sin esto la cabecera pegada tapa el titulo. */
+  scroll-margin-top: 80px;
+}
+.fila-foto.revisada { opacity: .72; }
+.fila-foto.revisada:hover { opacity: 1; }
+.fila-foto-cabecera h2 { display: flex; align-items: center; gap: .6rem; font-size: 1.1rem; }
+.fila-foto .bloque-ayuda { margin-bottom: .8rem; }
+
+.candidatas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: .7rem;
+}
+.candidata {
+  display: block;
+  padding: 0;
+  text-align: left;
+  font-family: inherit;
+  background: var(--papel);
+  border: 3px solid var(--linea);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .12s, transform .12s;
+}
+.candidata:hover { border-color: var(--tinta-tenue); transform: translateY(-2px); }
+.candidata-elegida { border-color: var(--verde); }
+.candidata img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  background: var(--fondo);
+}
+.candidata-pie { display: block; padding: .45rem .55rem .55rem; }
+.candidata-titulo {
+  display: block;
+  font-size: .78rem;
+  color: var(--tinta);
+  line-height: 1.3;
+  /* Corta el título a dos líneas con puntos suspensivos, para que todas las
+     tarjetas midan lo mismo aunque los títulos sean muy dispares. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.candidata-licencia { display: block; font-size: .7rem; color: var(--tinta-tenue); margin-top: .2rem; }
+.candidata-collage { border-style: dashed; }
+
+/* La atribucion de la foto. Pequenia pero visible: las licencias Creative
+   Commons obligan a citar al autor, y ademas es lo justo. */
+.atribucion {
+  font-size: .72rem;
+  color: var(--tinta-tenue);
+  line-height: 1.4;
+  margin: .4rem 0 0;
+}
+.atribucion a { color: var(--tinta-suave); }
+
 /* ---------------------------------------------------------------------------
    5. MOVIL
    Una "media query" aplica reglas solo cuando se cumple una condicion. Aqui,
@@ -561,6 +788,11 @@ main { padding: 2rem 0 3rem; }
   .ficha-columnas { grid-template-columns: 1fr; gap: 1.75rem; }
   .cifra-grande { font-size: 1.7rem; }
   .bloque-cabecera { flex-direction: column; align-items: flex-start; }
+  /* En móvil la barra pegada ocuparía media pantalla, así que baja al flujo. */
+  .barra-seleccion { position: static; gap: 1rem; }
+  .barra-botones { margin-left: 0; width: 100%; }
+  .barra-botones button { flex: 1; }
+  .filtros-cuenta { margin-left: 0; }
 }
 
 /* ---------------------------------------------------------------------------
@@ -571,9 +803,13 @@ main { padding: 2rem 0 3rem; }
    --------------------------------------------------------------------------- */
 @media print {
   .cabecera, .pie, .boton-secundario, .boton-principal,
-  .rejilla-recetas, .explicacion, .volver, .nutricion, .aviso-info {
+  .rejilla-recetas, .explicacion, .volver, .nutricion, .aviso-info,
+  .completar, .barra-seleccion, .filtros {
     display: none !important;
   }
+  /* En papel, un enlace subrayado en azul no sirve para nada: no se puede
+     pulsar. Se imprime como texto normal. */
+  .enlace-producto { color: #000 !important; text-decoration: none !important; }
   body { background: #fff; font-size: 11pt; }
   .contenedor { max-width: 100%; padding: 0; }
   .tarjeta, .presupuesto, .calendario { box-shadow: none; border: 1px solid #ccc; }

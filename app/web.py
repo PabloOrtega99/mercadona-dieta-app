@@ -20,14 +20,16 @@ plantilla de la carpeta plantillas/ con los datos que le pasamos.
 Explicacion completa en docs/07-la-interfaz-web.md
 """
 
+import json
 import sys
 import threading
 import webbrowser
 
 from flask import Flask, abort, redirect, render_template, request, send_file, url_for
 
-from app import config, datos_app, recetario
-from app.imagenes import collage
+from app import config, datos_app, recetario, token_mercadona
+from app.imagenes import fotos
+from app.mercadona import carrito
 from app.planificador import planificador
 from app.utiles import formato_euros
 
@@ -105,40 +107,67 @@ def inicio():
     )
 
 
-@app.route("/plan", methods=["POST"])
-def generar():
-    """Recibe el formulario, calcula el plan y lo ensena."""
+@app.route("/elegir", methods=["POST"])
+def elegir():
+    """Paso 2: ensena la propuesta de recetas para que la retoques.
+
+    Esta ruta se llama a si misma. La primera vez llega desde el formulario y
+    pide una propuesta al algoritmo; despues, cada vez que pulsas "Actualizar",
+    vuelve aqui con TU seleccion y solo recalcula los numeros.
+
+    Lo que distingue un caso del otro es el campo oculto "recalcular", que solo
+    viaja en el segundo.
+    """
     if ERROR_ARRANQUE:
         return render_template("error.html", mensaje=ERROR_ARRANQUE)
 
-    # request.form son los datos que ha enviado el formulario. Vienen SIEMPRE
-    # como texto (aunque el campo sea numérico) y pueden venir vacíos o con
-    # cualquier cosa, porque el usuario puede escribir lo que quiera.
-    # Por eso todo pasa por _numero(), que valida y pone límites.
-    presupuesto = _numero(request.form.get("presupuesto"), 20, 2000, 80)
-    semanas = int(_numero(request.form.get("semanas"), 1, 4, 1))
-    personas = int(_numero(request.form.get("personas"), 1, 8, 1))
+    peticion = _leer_peticion(request.form)
+    contexto = _preparar_contexto(peticion)
 
-    dieta = request.form.get("dieta", "equilibrada")
-    if dieta not in recetario.DIETAS:
-        dieta = "equilibrada"
+    if request.form.get("recalcular") == "1":
+        seleccion = _leer_seleccion(request.form)
+    else:
+        seleccion = planificador.proponer_recetas(
+            presupuesto=peticion["presupuesto"],
+            semanas=peticion["semanas"],
+            personas=peticion["personas"],
+            dieta=peticion["dieta"],
+            recetas=DATOS.recetas,
+            contexto=contexto,
+        )
 
-    # Una casilla marcada llega como "on"; si está sin marcar, no llega nada.
-    con_desayunos = request.form.get("desayunos") == "on"
-    despensa_en_casa = request.form.get("despensa") == "on"
+    return _pantalla_elegir(peticion, contexto, seleccion)
 
-    plan = planificador.generar_plan(
-        presupuesto=presupuesto,
-        semanas=semanas,
-        personas=personas,
-        dieta=dieta,
-        ingredientes=DATOS.ingredientes,
-        recetas=DATOS.recetas,
-        emparejamientos=DATOS.emparejamientos,
-        productos=DATOS.productos,
-        basicos=DATOS.basicos,
-        con_desayunos=con_desayunos,
-        despensa_en_casa=despensa_en_casa,
+
+@app.route("/plan", methods=["POST"])
+def generar():
+    """Paso 3: monta el plan con las recetas que has elegido."""
+    if ERROR_ARRANQUE:
+        return render_template("error.html", mensaje=ERROR_ARRANQUE)
+
+    peticion = _leer_peticion(request.form)
+    contexto = _preparar_contexto(peticion)
+    seleccion = _leer_seleccion(request.form)
+
+    if not seleccion:
+        # Sin recetas no hay plan. En vez de enseñar una página vacía y rara,
+        # se vuelve al selector con el aviso puesto.
+        return _pantalla_elegir(
+            peticion,
+            contexto,
+            {},
+            aviso="No has elegido ninguna receta. Marca al menos una para poder "
+            "generar el plan.",
+        )
+
+    plan = planificador.construir_plan(
+        seleccion=seleccion,
+        presupuesto=peticion["presupuesto"],
+        semanas=peticion["semanas"],
+        personas=peticion["personas"],
+        dieta=peticion["dieta"],
+        contexto=contexto,
+        con_desayunos=peticion["con_desayunos"],
     )
 
     lineas = plan.cesta.lineas_de_compra()
@@ -151,6 +180,8 @@ def generar():
         compra=_agrupar_compra(lineas),
         total_productos=sum(linea["unidades"] for linea in lineas),
         semaforo=_semaforo_nutricional(plan),
+        peticion=peticion,
+        seleccion_form=_seleccion_a_formulario(seleccion),
     )
 
 
@@ -180,12 +211,13 @@ def ficha_receta(id_receta):
         lineas=cesta.lineas_de_compra(),
         coste=cesta.coste_total(),
         nombres_dietas=recetario.NOMBRES_DIETAS,
+        imagen=DATOS.imagenes.get(receta.id),
     )
 
 
 @app.route("/receta/<id_receta>/imagen.png")
 def imagen_receta(id_receta):
-    """La imagen de la receta: el collage con las fotos de los ingredientes."""
+    """La imagen de la receta: la foto del plato, o el collage si no hay."""
     if ERROR_ARRANQUE or DATOS is None:
         abort(404)
 
@@ -193,15 +225,196 @@ def imagen_receta(id_receta):
     if receta is None:
         abort(404)
 
-    ruta = collage.obtener(
-        receta, DATOS.ingredientes, DATOS.emparejamientos, DATOS.productos
+    ruta, tipo = fotos.obtener(
+        receta, DATOS.imagenes, DATOS.ingredientes, DATOS.emparejamientos, DATOS.productos
     )
     if ruta is None:
         # Sin imagen devolvemos una foto vacía en lugar de un error, para que
         # el hueco de la tarjeta se vea limpio y no con el icono roto.
         return send_file(config.RAIZ / "app" / "estaticos" / "sin-imagen.svg")
 
-    return send_file(ruta, mimetype="image/png")
+    return send_file(ruta, mimetype="image/jpeg" if tipo == "plato" else "image/png")
+
+
+@app.route("/fotos")
+def revisar_fotos():
+    """Pantalla para elegir la foto de cada receta.
+
+    Ensena las candidatas que encontro scripts/buscar_fotos.py y te deja
+    pulsar la que mejor represente el plato. La eleccion se guarda al momento.
+    """
+    if ERROR_ARRANQUE:
+        return render_template("error.html", mensaje=ERROR_ARRANQUE)
+
+    candidatas = _cargar_candidatas()
+    if not candidatas:
+        return render_template(
+            "error.html",
+            mensaje=(
+                "Todavia no se han buscado fotos de plato.\n"
+                "Ejecuta:  python scripts/buscar_fotos.py --preseleccionar"
+            ),
+        )
+
+    # "sin_revisar" enseña solo las que aún no has tocado a mano. Con 130
+    # recetas, poder ir tachando lo pendiente es la diferencia entre terminar
+    # la revisión y abandonarla a la mitad.
+    solo_pendientes = request.args.get("pendientes") == "1"
+
+    filas = []
+    for receta in sorted(DATOS.recetas.values(), key=lambda r: r.nombre):
+        eleccion = DATOS.imagenes.get(receta.id)
+        revisada = bool(eleccion and eleccion.get("revisada"))
+        if solo_pendientes and revisada:
+            continue
+        filas.append(
+            {
+                "receta": receta,
+                "candidatas": candidatas.get(receta.id, []),
+                "eleccion": eleccion,
+                "revisada": revisada,
+            }
+        )
+
+    return render_template(
+        "fotos.html",
+        datos=DATOS,
+        filas=filas,
+        total=len(DATOS.recetas),
+        revisadas=sum(1 for e in DATOS.imagenes.values() if e.get("revisada")),
+        con_foto=len(DATOS.imagenes),
+        solo_pendientes=solo_pendientes,
+    )
+
+
+@app.route("/fotos/elegir", methods=["POST"])
+def elegir_foto():
+    """Guarda la foto elegida para una receta."""
+    if ERROR_ARRANQUE:
+        abort(400)
+
+    id_receta = request.form.get("receta", "")
+    if id_receta not in DATOS.recetas:
+        abort(404)
+
+    indice = request.form.get("indice", "")
+    candidatas = _cargar_candidatas().get(id_receta, [])
+
+    elecciones = dict(DATOS.imagenes)
+
+    if indice == "collage":
+        # Quitar la foto de plato: vuelve a usarse el collage de productos.
+        elecciones.pop(id_receta, None)
+    else:
+        try:
+            elegida = dict(candidatas[int(indice)])
+        except (ValueError, IndexError):
+            abort(400)
+        # "revisada" marca que la eligió una persona, no el preseleccionador.
+        elegida["revisada"] = True
+        elecciones[id_receta] = elegida
+
+    fotos.guardar_elecciones(elecciones)
+    DATOS.imagenes = elecciones
+
+    # Al cambiar de foto hay que tirar la copia descargada de la anterior.
+    # Si no, se seguiría viendo la vieja para siempre, que es un fallo de los
+    # que vuelven loco a cualquiera: "he cambiado la foto y no cambia nada".
+    ruta = fotos.ruta_de(DATOS.recetas[id_receta])
+    if ruta.exists():
+        ruta.unlink()
+
+    destino = url_for("revisar_fotos")
+    if request.form.get("pendientes") == "1":
+        destino += "?pendientes=1"
+    return redirect(f"{destino}#receta-{id_receta}")
+
+
+# ---------------------------------------------------------------------------
+# COMPLETAR LA COMPRA EN MERCADONA
+# ---------------------------------------------------------------------------
+
+
+@app.route("/carrito/token", methods=["GET", "POST"])
+def configurar_token():
+    """Pantalla para pegar el token de tu sesion de Mercadona."""
+    mensaje = None
+    if request.method == "POST":
+        if request.form.get("accion") == "borrar":
+            token_mercadona.borrar()
+            mensaje = ("ok", "Token borrado.")
+        else:
+            pegado = request.form.get("token", "").strip()
+            if not pegado:
+                mensaje = ("error", "No has pegado nada.")
+            else:
+                token_mercadona.guardar(pegado)
+                # No basta con que el token parezca bien formado: se prueba
+                # contra Mercadona de verdad. Es mucho mejor decirte ahora que
+                # no vale, que dejarte descubrirlo cuando vayas a comprar.
+                vale, detalle = carrito.comprobar_token(token_mercadona.leer())
+                mensaje = ("ok" if vale else "error", detalle)
+
+    return render_template(
+        "token.html",
+        datos=DATOS,
+        estado=token_mercadona.estado(),
+        mensaje=mensaje,
+    )
+
+
+@app.route("/completar-compra", methods=["POST"])
+def completar_compra():
+    """Mete la lista de la compra en tu carrito de Mercadona.
+
+    Llena el carrito. NO compra nada: despues tienes que entrar en Mercadona,
+    revisar la cesta y pagar tu.
+    """
+    if ERROR_ARRANQUE:
+        return render_template("error.html", mensaje=ERROR_ARRANQUE)
+
+    # Las líneas viajan desde la página del plan en campos ocultos. Se podría
+    # recalcular el plan aquí, pero entonces el carrito podría no coincidir
+    # exactamente con la lista que estás viendo, y eso sería inaceptable.
+    lineas = []
+    for clave, valor in request.form.items():
+        if not clave.startswith("producto_"):
+            continue
+        lineas.append(
+            {
+                "id": clave[len("producto_"):],
+                "unidades": int(_numero(valor, 1, 99, 1)),
+                "nombre": request.form.get(f"nombre_{clave[len('producto_'):]}", ""),
+            }
+        )
+
+    estado = token_mercadona.estado()
+    resultado = None
+    error = None
+
+    if not lineas:
+        error = "La lista de la compra llego vacia."
+    elif not estado.valido:
+        error = estado.mensaje
+    else:
+        try:
+            resultado = carrito.anadir(token_mercadona.leer(), estado.id_cliente, lineas)
+        except carrito.ErrorCarrito as fallo:
+            error = str(fallo)
+
+    return render_template(
+        "compra.html",
+        datos=DATOS,
+        lineas=lineas,
+        resultado=resultado,
+        error=error,
+        estado=estado,
+        total=sum(
+            float(DATOS.productos[l["id"]]["precio"]) * l["unidades"]
+            for l in lineas
+            if l["id"] in DATOS.productos
+        ),
+    )
 
 
 @app.route("/recargar")
@@ -217,8 +430,148 @@ def recargar():
 
 
 # ---------------------------------------------------------------------------
+# EL FLUJO DE TRES PASOS
+# ---------------------------------------------------------------------------
+#
+# La app tiene tres pantallas encadenadas:
+#
+#     /  ──>  /elegir  ──>  /plan
+#
+# y hay que arrastrar información de una a otra: lo que pediste en el
+# formulario, y luego las recetas que has marcado.
+#
+# Se hace con CAMPOS OCULTOS del formulario (<input type="hidden">), no con
+# sesiones ni cookies. Es la solución más sencilla que funciona bien:
+#
+#   - El servidor no guarda nada entre peticiones, así que no hay estado que
+#     se quede desincronizado ni que caduque.
+#   - Puedes abrir dos pestañas con dos planes distintos y no se pisan.
+#   - El botón "atrás" del navegador se comporta como esperas.
+#
+# El precio a pagar es que la información viaja en cada envío. Con cuatro
+# números y unas pocas recetas marcadas es irrelevante.
+
+
+def _leer_peticion(form) -> dict:
+    """Lee y valida los datos del formulario del paso 1.
+
+    Todo lo que llega de un formulario es TEXTO y puede ser cualquier cosa:
+    vacio, "hola" o un numero absurdo. Aqui se convierte y se acota una sola
+    vez, para que a partir de este punto el resto del programa pueda fiarse.
+    """
+    dieta = form.get("dieta", "equilibrada")
+    if dieta not in recetario.DIETAS:
+        dieta = "equilibrada"
+
+    return {
+        "presupuesto": _numero(form.get("presupuesto"), 20, 2000, 80),
+        "semanas": int(_numero(form.get("semanas"), 1, 4, 1)),
+        "personas": int(_numero(form.get("personas"), 1, 8, 1)),
+        "dieta": dieta,
+        # Una casilla marcada llega como "on"; sin marcar, no llega nada.
+        "con_desayunos": form.get("desayunos") == "on",
+        "despensa_en_casa": form.get("despensa") == "on",
+    }
+
+
+def _preparar_contexto(peticion: dict):
+    """Monta el Contexto del planificador a partir de la peticion."""
+    return planificador.preparar_contexto(
+        semanas=peticion["semanas"],
+        personas=peticion["personas"],
+        dieta=peticion["dieta"],
+        ingredientes=DATOS.ingredientes,
+        emparejamientos=DATOS.emparejamientos,
+        productos=DATOS.productos,
+        basicos=DATOS.basicos,
+        con_desayunos=peticion["con_desayunos"],
+        despensa_en_casa=peticion["despensa_en_casa"],
+    )
+
+
+def _leer_seleccion(form) -> dict:
+    """Lee que recetas has marcado y cuantas veces cocinas cada una.
+
+    En el formulario, cada receta manda dos campos:
+        incluir_<id>  ->  la casilla; solo llega si esta marcada
+        veces_<id>    ->  cuantas veces la cocinas
+
+    Devuelve {Receta: veces}, que es justo lo que espera construir_plan().
+    """
+    seleccion = {}
+    for clave in form:
+        if not clave.startswith("incluir_"):
+            continue
+        id_receta = clave[len("incluir_"):]
+        receta = DATOS.recetas.get(id_receta)
+        if receta is None:
+            continue  # id inventado o receta borrada del JSON: se ignora
+        veces = int(_numero(form.get(f"veces_{id_receta}"), 1, 20, 1))
+        seleccion[receta] = veces
+    return seleccion
+
+
+def _seleccion_a_formulario(seleccion: dict) -> list[dict]:
+    """Convierte la seleccion en algo que la plantilla pueda pintar como ocultos."""
+    return [
+        {"id": receta.id, "veces": veces}
+        for receta, veces in sorted(seleccion.items(), key=lambda p: p[0].nombre)
+    ]
+
+
+def _pantalla_elegir(peticion: dict, contexto, seleccion: dict, aviso: str | None = None):
+    """Pinta la pantalla de seleccion de recetas."""
+    candidatas = [
+        receta for receta in DATOS.recetas.values() if receta.vale_para(peticion["dieta"])
+    ]
+    candidatas.sort(key=lambda r: r.nombre)
+
+    # El coste real de lo que llevas marcado. Se calcula AQUÍ, en el servidor,
+    # porque depende del coste marginal (qué envases comparten las recetas
+    # entre sí) y eso el navegador no lo puede saber. Ver el comentario de
+    # estaticos/selector.js.
+    coste = planificador.cesta_de(seleccion, contexto).coste_total()
+
+    raciones = sum(receta.raciones * veces for receta, veces in seleccion.items())
+    comidas_cubiertas = raciones // max(1, peticion["personas"])
+    comidas_necesarias = config.COMIDAS_POR_SEMANA * peticion["semanas"]
+
+    return render_template(
+        "elegir.html",
+        datos=DATOS,
+        peticion=peticion,
+        candidatas=candidatas,
+        seleccion={receta.id: veces for receta, veces in seleccion.items()},
+        nombres_dietas=recetario.NOMBRES_DIETAS,
+        nombres_dificultad=recetario.NOMBRES_DIFICULTAD,
+        dificultades=recetario.DIFICULTADES,
+        coste=coste,
+        comidas_cubiertas=comidas_cubiertas,
+        comidas_necesarias=comidas_necesarias,
+        aviso=aviso,
+    )
+
+
+# ---------------------------------------------------------------------------
 # AYUDAS
 # ---------------------------------------------------------------------------
+
+
+def _cargar_candidatas() -> dict[str, list]:
+    """Lee las fotos candidatas que dejo el script de busqueda.
+
+    Se lee del disco en cada visita a /fotos, y no se guarda en memoria como
+    el resto de datos, a proposito: es una pantalla que se usa un rato y luego
+    no se vuelve a abrir en semanas. No merece la pena tener varios megas de
+    candidatas ocupando memoria todo el rato para eso.
+    """
+    if not config.ARCHIVO_CANDIDATAS.exists():
+        return {}
+    try:
+        with open(config.ARCHIVO_CANDIDATAS, "r", encoding="utf-8") as archivo:
+            return json.load(archivo)
+    except (OSError, json.JSONDecodeError):
+        return {}
 
 
 def _numero(texto, minimo, maximo, por_defecto):

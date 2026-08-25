@@ -1,0 +1,157 @@
+{# Paso 2: elegir que recetas entran en el menu.
+
+   Toda la pagina es UN solo formulario con dos botones de envio:
+     - "Actualizar seleccion"  -> vuelve a /elegir y recalcula el coste real
+     - "Ver mi plan"           -> va a /plan y monta el resultado final
+
+   El truco de los dos destinos es el atributo formaction de cada boton, que
+   manda el formulario a una ruta distinta de la que dice el <form>. #}
+{% extends "base.html" %}
+
+{% block titulo %}Elige tus recetas{% endblock %}
+
+{% block contenido %}
+
+<section class="portada">
+  <h1>Elige qué te apetece cocinar</h1>
+  <p class="subtitulo">
+    Te he dejado marcada una propuesta para
+    {{ peticion.presupuesto | euros }} · {{ peticion.semanas }} semana{{ 's' if peticion.semanas > 1 }} ·
+    {{ peticion.personas }} persona{{ 's' if peticion.personas > 1 }} ·
+    {{ nombres_dietas[peticion.dieta] }}.
+    Quita lo que no te apetezca y añade lo que sí.
+  </p>
+</section>
+
+{% if aviso %}
+  <p class="aviso aviso-atencion">{{ aviso }}</p>
+{% endif %}
+
+<form method="post" action="{{ url_for('elegir') }}" id="formulario-seleccion">
+
+  {# --- Los datos del paso 1 viajan escondidos ---------------------------- #}
+  <input type="hidden" name="presupuesto" value="{{ peticion.presupuesto }}">
+  <input type="hidden" name="semanas" value="{{ peticion.semanas }}">
+  <input type="hidden" name="personas" value="{{ peticion.personas }}">
+  <input type="hidden" name="dieta" value="{{ peticion.dieta }}">
+  {% if peticion.con_desayunos %}<input type="hidden" name="desayunos" value="on">{% endif %}
+  {% if peticion.despensa_en_casa %}<input type="hidden" name="despensa" value="on">{% endif %}
+  {# Este marca la diferencia entre "dame una propuesta" y "recalcula lo mio" #}
+  <input type="hidden" name="recalcular" value="1">
+
+  {# --- La barra que te sigue por la pantalla ----------------------------- #}
+  {# position: sticky la mantiene visible al hacer scroll, para que siempre
+     sepas cuántas comidas llevas cubiertas sin tener que subir. #}
+  <div class="barra-seleccion" id="barra-seleccion"
+       data-personas="{{ peticion.personas }}"
+       data-necesarias="{{ comidas_necesarias }}">
+
+    <div class="barra-dato">
+      <span class="etiqueta">Comidas cubiertas</span>
+      <strong class="cifra-media">
+        <span id="contador-comidas">{{ comidas_cubiertas }}</span> / {{ comidas_necesarias }}
+      </strong>
+      <span class="ayuda" id="aviso-comidas"></span>
+    </div>
+
+    <div class="barra-dato">
+      <span class="etiqueta">Coste de la compra</span>
+      <strong class="cifra-media {{ 'texto-error' if coste > peticion.presupuesto }}">
+        {{ coste | euros }}
+      </strong>
+      <span class="ayuda">de {{ peticion.presupuesto | euros }}</span>
+    </div>
+
+    <div class="barra-botones">
+      <button type="submit" class="boton-secundario">Actualizar</button>
+      <button type="submit" class="boton-principal boton-estrecho"
+              formaction="{{ url_for('generar') }}">Ver mi plan →</button>
+    </div>
+  </div>
+
+  {# --- Filtros. Son solo de JavaScript: esconden tarjetas, no recargan --- #}
+  <div class="filtros">
+    <label>
+      Dificultad
+      <select id="filtro-dificultad">
+        <option value="">Todas</option>
+        {% for d in dificultades %}
+          <option value="{{ d }}">{{ nombres_dificultad[d] }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      Tiempo máximo
+      <select id="filtro-tiempo">
+        <option value="">Sin límite</option>
+        <option value="25">25 minutos</option>
+        <option value="40">40 minutos</option>
+        <option value="60">60 minutos</option>
+      </select>
+    </label>
+    <label class="casilla-simple">
+      <input type="checkbox" id="filtro-marcadas">
+      Ver solo las marcadas
+    </label>
+    <span class="filtros-cuenta"><span id="cuenta-visibles">{{ candidatas | length }}</span> recetas</span>
+  </div>
+
+  {# --- Las recetas -------------------------------------------------------- #}
+  <div class="rejilla-elegir">
+    {% for receta in candidatas %}
+      {% set veces = seleccion.get(receta.id, 0) %}
+      <label class="tarjeta-elegir {{ 'elegida' if veces }}"
+             data-dificultad="{{ receta.dificultad }}"
+             data-minutos="{{ receta.minutos }}">
+
+        <input type="checkbox" name="incluir_{{ receta.id }}"
+               class="casilla-receta" {{ 'checked' if veces }}
+               data-raciones="{{ receta.raciones }}">
+
+        <img src="{{ url_for('imagen_receta', id_receta=receta.id) }}"
+             alt="" loading="lazy">
+
+        <div class="tarjeta-elegir-cuerpo">
+          <h3>{{ receta.nombre }}</h3>
+          <p class="tarjeta-elegir-datos">
+            <span class="pastilla pastilla-{{ receta.dificultad }}">{{ receta.nombre_dificultad }}</span>
+            {{ receta.minutos }} min · {{ receta.raciones }} raciones
+          </p>
+          <p class="tarjeta-elegir-cifras">
+            {{ (receta._coste_racion_cache or 0) | euros }}/ración por sí sola ·
+            {{ (receta._kcal_racion_cache or 0) | round | int }} kcal
+          </p>
+
+          <div class="tarjeta-elegir-pie">
+            {# El "veces" solo importa si la casilla está marcada. Se deja
+               siempre en el HTML porque es más simple que ir creándolo y
+               borrándolo, y el servidor ignora los que no vienen marcados. #}
+            <span class="veces-etiqueta">Cocinarla</span>
+            <select name="veces_{{ receta.id }}" class="selector-veces">
+              {% for n in range(1, 6) %}
+                <option value="{{ n }}" {{ 'selected' if veces == n or (veces == 0 and n == 1) }}>
+                  {{ n }} vez{{ 'es' if n > 1 }}
+                </option>
+              {% endfor %}
+            </select>
+            <a class="enlace-ficha" href="{{ url_for('ficha_receta', id_receta=receta.id) }}"
+               target="_blank" onclick="event.stopPropagation()">ver receta</a>
+          </div>
+        </div>
+      </label>
+    {% endfor %}
+  </div>
+
+  <p class="sin-resultados" id="sin-resultados" hidden>
+    Ninguna receta cumple esos filtros. Prueba a relajarlos.
+  </p>
+
+</form>
+
+<p class="volver">
+  <a class="boton-secundario" href="{{ url_for('inicio') }}">← Cambiar presupuesto o dieta</a>
+</p>
+
+<script src="{{ url_for('static', filename='selector.js') }}"></script>
+
+{% endblock %}

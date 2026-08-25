@@ -1,0 +1,108 @@
+{# Pantalla para elegir la foto de plato de cada receta.
+
+   Cada fila es un formulario independiente. Al pulsar una foto se envia y la
+   pagina vuelve a cargar en la misma receta (por el ancla #receta-xxx), asi
+   que puedes ir bajando y eligiendo sin perder el sitio. #}
+{% extends "base.html" %}
+
+{% block titulo %}Revisar las fotos de las recetas{% endblock %}
+
+{% block contenido %}
+
+<section class="portada">
+  <h1>Elige la foto de cada receta</h1>
+  <p class="subtitulo">
+    Pulsa la foto que mejor represente el plato. Ya viene elegida la primera
+    candidata de cada una, así que solo tienes que cambiar las que no peguen.
+    Se guarda al momento.
+  </p>
+</section>
+
+<div class="barra-seleccion">
+  <div class="barra-dato">
+    <span class="etiqueta">Recetas con foto de plato</span>
+    <strong class="cifra-media">{{ con_foto }} / {{ total }}</strong>
+  </div>
+  <div class="barra-dato">
+    <span class="etiqueta">Revisadas por ti</span>
+    <strong class="cifra-media">{{ revisadas }}</strong>
+  </div>
+  <div class="barra-botones">
+    {% if solo_pendientes %}
+      <a class="boton-secundario" href="{{ url_for('revisar_fotos') }}">Ver todas</a>
+    {% else %}
+      <a class="boton-secundario" href="{{ url_for('revisar_fotos', pendientes=1) }}">
+        Ver solo las que no he revisado
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+{% if not filas %}
+  <p class="sin-resultados">
+    ¡Todas revisadas! <a href="{{ url_for('inicio') }}">Volver al inicio</a>
+  </p>
+{% endif %}
+
+{% for fila in filas %}
+  <section class="fila-foto {{ 'revisada' if fila.revisada }}" id="receta-{{ fila.receta.id }}">
+
+    <div class="fila-foto-cabecera">
+      <h2>
+        {{ fila.receta.nombre }}
+        {% if fila.revisada %}<span class="insignia">revisada</span>{% endif %}
+      </h2>
+      <p class="bloque-ayuda">
+        <span class="pastilla pastilla-{{ fila.receta.dificultad }}">{{ fila.receta.nombre_dificultad }}</span>
+        {{ fila.receta.minutos }} min ·
+        <a href="{{ url_for('ficha_receta', id_receta=fila.receta.id) }}" target="_blank">ver la receta</a>
+      </p>
+    </div>
+
+    {% if not fila.candidatas %}
+      <p class="aviso aviso-atencion">
+        No se ha encontrado ninguna foto para esta receta. Se sigue usando el
+        collage de productos, que también funciona.
+      </p>
+    {% else %}
+      <form method="post" action="{{ url_for('elegir_foto') }}">
+        <input type="hidden" name="receta" value="{{ fila.receta.id }}">
+        {% if solo_pendientes %}<input type="hidden" name="pendientes" value="1">{% endif %}
+
+        <div class="candidatas">
+          {% for candidata in fila.candidatas %}
+            {# Cada foto es el propio boton de envio. Es lo mas directo: la
+               pulsas y ya esta elegida, sin marcar y luego confirmar. #}
+            <button type="submit" name="indice" value="{{ loop.index0 }}"
+                    class="candidata {{ 'candidata-elegida' if fila.eleccion and fila.eleccion.url == candidata.url }}"
+                    title="{{ candidata.titulo }}">
+              <img src="{{ candidata.url }}" alt="{{ candidata.titulo }}" loading="lazy">
+              <span class="candidata-pie">
+                <span class="candidata-titulo">{{ candidata.titulo[:52] }}</span>
+                <span class="candidata-licencia">{{ candidata.licencia }} · {{ candidata.origen }}</span>
+              </span>
+            </button>
+          {% endfor %}
+
+          {# La salida de emergencia: si ninguna foto pega, mejor el collage
+             de productos que una foto que confunde. #}
+          <button type="submit" name="indice" value="collage"
+                  class="candidata candidata-collage {{ 'candidata-elegida' if not fila.eleccion }}">
+            <img src="{{ url_for('imagen_receta', id_receta=fila.receta.id) }}"
+                 alt="Collage de productos" loading="lazy">
+            <span class="candidata-pie">
+              <span class="candidata-titulo">Ninguna me convence</span>
+              <span class="candidata-licencia">usar el collage de productos</span>
+            </span>
+          </button>
+        </div>
+      </form>
+    {% endif %}
+  </section>
+{% endfor %}
+
+<p class="volver">
+  <a class="boton-secundario" href="{{ url_for('inicio') }}">← Volver al inicio</a>
+</p>
+
+{% endblock %}
