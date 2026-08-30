@@ -45,6 +45,7 @@ def main() -> int:
     solo_nuevas = "--solo-nuevas" in sys.argv
 
     recetas = recetario.cargar_recetas()
+    ingredientes = recetario.cargar_ingredientes()
     elecciones = fotos.cargar_elecciones()
     candidatas = _cargar_candidatas()
 
@@ -70,7 +71,10 @@ def main() -> int:
     usadas = {e["url"] for e in elecciones.values() if e.get("url")}
 
     for numero, receta in enumerate(sorted(pendientes, key=lambda r: r.nombre), start=1):
-        encontradas = buscador.buscar_candidatas(receta.nombre, CANDIDATAS_POR_RECETA)
+        principal = _ingrediente_principal(receta, ingredientes)
+        encontradas = buscador.buscar_candidatas(
+            receta.nombre, CANDIDATAS_POR_RECETA, ingrediente_principal=principal
+        )
         candidatas[receta.id] = encontradas
 
         # Para PRESELECCIONAR solo valen las que coinciden de verdad con el
@@ -130,6 +134,46 @@ def main() -> int:
     print("\n  Revisa y cambia las que no te gusten en:  http://localhost:8000/fotos")
     print("=" * 70)
     return 0
+
+
+# El orden de que grupo "define" mas un plato que otro, de mayor a menor.
+#
+# Hace falta porque el peso en gramos SOLO no sirve: en "Pollo al horno con
+# patatas" hay 800 g de patata por 600 g de pechuga de pollo. Si el criterio
+# fuera "el que mas pesa", el ingrediente principal saldria "Patata", que es
+# precisamente el fallo que se queria arreglar (una foto de patatas sin
+# pollo). Un pollo asado sigue siendo un plato de pollo aunque la guarnicion
+# pese mas: la proteina define el plato antes que la guarnicion.
+PRIORIDAD_GRUPO = (
+    "carne", "pescado", "huevo", "legumbre", "lacteo", "fruto_seco", "cereal",
+    "verdura", "fruta",
+)
+
+
+def _ingrediente_principal(receta, ingredientes: dict) -> str | None:
+    """El ingrediente que mejor define de que va la receta, o None.
+
+    Mismo filtro de fuera-despensa-y-condimento que ya usa
+    Receta.grupos_relevantes() y collage.py. Entre lo que queda, gana primero
+    el grupo mas arriba en PRIORIDAD_GRUPO y, dentro del mismo grupo, el que
+    mas gramos lleva.
+    """
+    candidatos = []
+    for item in receta.ingredientes:
+        ingrediente = ingredientes.get(item.id)
+        if ingrediente is None or ingrediente.despensa or ingrediente.grupo == "condimento":
+            continue
+        prioridad = (
+            PRIORIDAD_GRUPO.index(ingrediente.grupo)
+            if ingrediente.grupo in PRIORIDAD_GRUPO
+            else len(PRIORIDAD_GRUPO)
+        )
+        candidatos.append((prioridad, -item.gramos, ingrediente.nombre))
+
+    if not candidatos:
+        return None
+    candidatos.sort()
+    return candidatos[0][2]
 
 
 def _cargar_candidatas() -> dict[str, list]:

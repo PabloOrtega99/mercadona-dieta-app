@@ -174,6 +174,8 @@ def proponer_recetas(
     dieta: str,
     recetas: dict[str, Receta],
     contexto: Contexto,
+    tiempo_max: int = 0,
+    preferencias: frozenset[str] = frozenset(),
 ) -> dict[Receta, int]:
     """Elige que recetas cocinar y cuantas veces. Devuelve {receta: veces}.
 
@@ -183,11 +185,24 @@ def proponer_recetas(
     una propuesta, dejar que el usuario la cambie, y luego construir el plan
     con lo que el haya decidido. Sin esta separacion habria que duplicar medio
     planificador.
+
+    `tiempo_max` (minutos, 0 = sin limite) es una restriccion DURA: una receta
+    de 90 minutos no aparece ni en la propuesta ni como opcion, si has pedido
+    "rapidas". Es distinto de las preferencias de mas abajo, que nunca
+    excluyen nada.
+
+    `preferencias` son grupos de alimento (ver recetario.GRUPOS_PREFERIBLES)
+    que el algoritmo prioriza un poco al gastar el presupuesto sobrante, sin
+    excluir jamas una receta por no tenerlos. Ver _calidad().
     """
     # Cuántas raciones hacen falta: 14 comidas por semana x semanas x personas.
     raciones_objetivo = config.COMIDAS_POR_SEMANA * semanas * personas
 
-    candidatas = [receta for receta in recetas.values() if receta.vale_para(dieta)]
+    candidatas = [
+        receta
+        for receta in recetas.values()
+        if receta.vale_para(dieta) and (tiempo_max <= 0 or receta.minutos <= tiempo_max)
+    ]
     if not candidatas:
         return {}
 
@@ -209,7 +224,7 @@ def proponer_recetas(
         # unas 750 por comida (el resto del día lo cubre el desayuno).
         kcal_objetivo = config.KCAL_OBJETIVO_COMIDA * raciones_objetivo
         seleccion = _mejorar_variedad(
-            seleccion, candidatas, presupuesto, contexto, kcal_objetivo
+            seleccion, candidatas, presupuesto, contexto, kcal_objetivo, preferencias
         )
 
     return seleccion
@@ -278,6 +293,8 @@ def generar_plan(
     basicos: list[dict],
     con_desayunos: bool = True,
     despensa_en_casa: bool = False,
+    tiempo_max: int = 0,
+    preferencias: frozenset[str] = frozenset(),
 ) -> Plan:
     """Propone recetas y monta el plan de una tacada.
 
@@ -303,6 +320,8 @@ def generar_plan(
         dieta=dieta,
         recetas=recetas,
         contexto=contexto,
+        tiempo_max=tiempo_max,
+        preferencias=preferencias,
     )
     return construir_plan(
         seleccion=seleccion,
@@ -424,12 +443,19 @@ PESO_RECETA_DISTINTA = 3.0
 PESO_GRUPO_ALIMENTO = 2.0
 PESO_REPETICION = 1.5
 PESO_CALORIAS = 15.0
+# Pequeño a propósito frente a los de arriba: las preferencias EMPUJAN hacia
+# recetas afines cuando hay margen, pero nunca deben pesar tanto como para
+# sacrificar variedad o calorías por perseguir el gusto marcado. Mismo
+# criterio de "informe, no restricción" que ya usa el proyecto con la
+# nutrición: un empujón suave, jamás una condición dura.
+PESO_PREFERENCIA = 1.0
 
 
 def _calidad(
     seleccion: dict[Receta, int],
     ingredientes: dict[str, Ingrediente],
     kcal_objetivo: float,
+    preferencias: frozenset[str] = frozenset(),
 ) -> float:
     """Puntua lo bueno que es un menu, al margen de lo que cueste. MAS ES MEJOR.
 
@@ -454,9 +480,16 @@ def _calidad(
         ya no podia subir mas y el algoritmo se plantaba ahi, con el dinero sin
         gastar y tu con hambre. Contando las calorias, prefiere platos que
         alimentan mientras el presupuesto lo permita.
+
+      + AFINIDAD CON LO QUE TE GUSTA. Si has marcado "pescado" como
+        preferencia, cada cocinada de una receta con pescado suma un poco.
+        Es el quinto termino, y el mas reciente: antes de existir esto no
+        habia forma de que la propuesta automatica tuviera en cuenta tus
+        gustos, solo el presupuesto y la variedad generica.
     """
     grupos = set()
     kcal_totales = 0.0
+    afinidad = 0
 
     for receta, veces in seleccion.items():
         for item in receta.ingredientes:
@@ -468,6 +501,9 @@ def _calidad(
 
         kcal_racion = getattr(receta, "_kcal_racion_cache", 0.0) or 0.0
         kcal_totales += kcal_racion * receta.raciones * veces
+
+        if preferencias and receta.grupos_relevantes(ingredientes) & preferencias:
+            afinidad += veces
 
     repeticiones = sum(veces - 1 for veces in seleccion.values())
 
@@ -481,6 +517,7 @@ def _calidad(
         + len(grupos) * PESO_GRUPO_ALIMENTO
         - repeticiones * PESO_REPETICION
         - desviacion * PESO_CALORIAS
+        + afinidad * PESO_PREFERENCIA
     )
 
 
@@ -490,6 +527,7 @@ def _mejorar_variedad(
     presupuesto: float,
     contexto: Contexto,
     kcal_objetivo: float,
+    preferencias: frozenset[str] = frozenset(),
 ) -> dict[Receta, int]:
     """Aprovecha el dinero que sobra para mejorar el menu.
 
@@ -513,7 +551,7 @@ def _mejorar_variedad(
     """
     cesta = _construir_cesta(seleccion, contexto)
     coste_actual = cesta.coste_total()
-    calidad_actual = _calidad(seleccion, contexto.ingredientes, kcal_objetivo)
+    calidad_actual = _calidad(seleccion, contexto.ingredientes, kcal_objetivo, preferencias)
 
     for _ in range(INTENTOS_DE_MEJORA):
         # Todos los cambios posibles, ordenados por cuánto prometen mejorar.
@@ -530,7 +568,8 @@ def _mejorar_variedad(
 
                 propuesta = _aplicar_cambio(seleccion, sale, entra)
                 ganancia = (
-                    _calidad(propuesta, contexto.ingredientes, kcal_objetivo) - calidad_actual
+                    _calidad(propuesta, contexto.ingredientes, kcal_objetivo, preferencias)
+                    - calidad_actual
                 )
                 if ganancia > 0:
                     propuestas.append((ganancia, sale, entra, propuesta))
@@ -553,7 +592,7 @@ def _mejorar_variedad(
             seleccion = propuesta
             cesta.anadir(diferencia)
             coste_actual = cesta.coste_total()
-            calidad_actual = _calidad(seleccion, contexto.ingredientes, kcal_objetivo)
+            calidad_actual = _calidad(seleccion, contexto.ingredientes, kcal_objetivo, preferencias)
             aplicado = True
             break
 

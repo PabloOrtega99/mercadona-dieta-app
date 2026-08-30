@@ -99,6 +99,8 @@ def inicio():
         "inicio.html",
         dietas=recetario.DIETAS,
         nombres_dietas=recetario.NOMBRES_DIETAS,
+        grupos_preferibles=recetario.GRUPOS_PREFERIBLES,
+        nombres_grupos=recetario.NOMBRES_GRUPOS,
         datos=DATOS,
         recetas_por_dieta={
             dieta: sum(1 for receta in DATOS.recetas.values() if receta.vale_para(dieta))
@@ -134,6 +136,8 @@ def elegir():
             dieta=peticion["dieta"],
             recetas=DATOS.recetas,
             contexto=contexto,
+            tiempo_max=peticion["tiempo_max"],
+            preferencias=peticion["preferencias"],
         )
 
     return _pantalla_elegir(peticion, contexto, seleccion)
@@ -463,6 +467,17 @@ def _leer_peticion(form) -> dict:
     if dieta not in recetario.DIETAS:
         dieta = "equilibrada"
 
+    # 0 = sin límite. Las franjas (25/40/60) son las mismas que ya usaba el
+    # filtro visual de /elegir, para no inventar una escala nueva.
+    tiempo_max = int(_numero(form.get("tiempo_max"), 0, 240, 0))
+
+    # Varios checkboxes con el mismo name="preferencias". getlist() los trae
+    # todos de una vez; el "& GRUPOS_PREFERIBLES" descarta cualquier valor que
+    # no sea uno de los grupos válidos, por si alguien manipula el formulario.
+    preferencias = frozenset(form.getlist("preferencias")) & frozenset(
+        recetario.GRUPOS_PREFERIBLES
+    )
+
     return {
         "presupuesto": _numero(form.get("presupuesto"), 20, 2000, 80),
         "semanas": int(_numero(form.get("semanas"), 1, 4, 1)),
@@ -471,6 +486,8 @@ def _leer_peticion(form) -> dict:
         # Una casilla marcada llega como "on"; sin marcar, no llega nada.
         "con_desayunos": form.get("desayunos") == "on",
         "despensa_en_casa": form.get("despensa") == "on",
+        "tiempo_max": tiempo_max,
+        "preferencias": preferencias,
     }
 
 
@@ -521,10 +538,35 @@ def _seleccion_a_formulario(seleccion: dict) -> list[dict]:
 
 def _pantalla_elegir(peticion: dict, contexto, seleccion: dict, aviso: str | None = None):
     """Pinta la pantalla de seleccion de recetas."""
+    tiempo_max = peticion["tiempo_max"]
     candidatas = [
-        receta for receta in DATOS.recetas.values() if receta.vale_para(peticion["dieta"])
+        receta
+        for receta in DATOS.recetas.values()
+        if receta.vale_para(peticion["dieta"])
+        and (tiempo_max <= 0 or receta.minutos <= tiempo_max)
     ]
     candidatas.sort(key=lambda r: r.nombre)
+
+    # Si el aviso no venía ya puesto (p. ej. "no has elegido ninguna receta"),
+    # avisamos cuando el tiempo máximo deja casi sin recetas para elegir. Es
+    # el mismo umbral (8) que usa recetario.comprobar() para decir que una
+    # dieta se queda corta de recetas. No se bloquea nada, solo se informa:
+    # mismo criterio que con el presupuesto insuficiente.
+    if aviso is None and tiempo_max > 0 and len(candidatas) < 8:
+        aviso = (
+            f"Con ese tiempo máximo casi no hay recetas de esta dieta "
+            f"({len(candidatas)}). Prueba a ampliarlo para tener más donde elegir."
+        )
+
+    # Qué recetas son afines a tus preferencias, para la insignia "Recomendada".
+    # Se calcula sobre TODAS las candidatas, no solo las elegidas: es
+    # informativo, ayuda a decidir qué marcar, no un resumen de lo ya marcado.
+    preferencias = peticion["preferencias"]
+    recomendadas = (
+        {r.id for r in candidatas if r.grupos_relevantes(DATOS.ingredientes) & preferencias}
+        if preferencias
+        else set()
+    )
 
     # El coste real de lo que llevas marcado. Se calcula AQUÍ, en el servidor,
     # porque depende del coste marginal (qué envases comparten las recetas
@@ -542,6 +584,7 @@ def _pantalla_elegir(peticion: dict, contexto, seleccion: dict, aviso: str | Non
         peticion=peticion,
         candidatas=candidatas,
         seleccion={receta.id: veces for receta, veces in seleccion.items()},
+        recomendadas=recomendadas,
         nombres_dietas=recetario.NOMBRES_DIETAS,
         nombres_dificultad=recetario.NOMBRES_DIFICULTAD,
         dificultades=recetario.DIFICULTADES,

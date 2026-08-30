@@ -35,6 +35,35 @@ NOMBRES_DIFICULTAD = {
     "elaborada": "Elaborada",
 }
 
+# Los grupos de alimento que tiene sentido que alguien marque como "me gusta
+# más esto". Son un subconjunto de los 12 valores de "grupo" que existen en
+# ingredientes.json: se dejan fuera "condimento", "otro" y "grasa" porque son
+# categorías técnicas o de despensa (el aceite, la sal...), no un gusto real
+# que alguien vaya a marcar en un formulario.
+GRUPOS_PREFERIBLES = (
+    "carne",
+    "pescado",
+    "huevo",
+    "lacteo",
+    "legumbre",
+    "verdura",
+    "fruta",
+    "cereal",
+    "fruto_seco",
+)
+
+NOMBRES_GRUPOS = {
+    "carne": "Carne",
+    "pescado": "Pescado y marisco",
+    "huevo": "Huevo",
+    "lacteo": "Lácteos",
+    "legumbre": "Legumbres",
+    "verdura": "Verdura",
+    "fruta": "Fruta",
+    "cereal": "Cereales y pasta",
+    "fruto_seco": "Frutos secos",
+}
+
 
 # ---------------------------------------------------------------------------
 # LAS "CAJAS" DE DATOS
@@ -110,6 +139,24 @@ class Receta:
     @property
     def nombre_dificultad(self) -> str:
         return NOMBRES_DIFICULTAD.get(self.dificultad, self.dificultad)
+
+    def grupos_relevantes(self, ingredientes: dict[str, Ingrediente]) -> set[str]:
+        """Los grupos de alimento que de verdad definen esta receta.
+
+        Se usa tanto para marcar "Recomendada" en la pantalla de elegir como
+        para el quinto termino de _calidad() en el planificador. Reutiliza
+        EXACTAMENTE el mismo criterio que ya usa collage.py para elegir las
+        fotos principales de una receta (excluir despensa y condimentos): si
+        una receta lleva sal, eso no la convierte en "afín a condimentos", lo
+        mismo que una foto de un bote de sal no representa el plato.
+        """
+        grupos = set()
+        for item in self.ingredientes:
+            ingrediente = ingredientes.get(item.id)
+            if ingrediente is None or ingrediente.despensa or ingrediente.grupo == "condimento":
+                continue
+            grupos.add(ingrediente.grupo)
+        return grupos
 
     def macros_por_racion(self, ingredientes: dict[str, Ingrediente]) -> dict:
         """Calcula kcal y macronutrientes de UNA ración.

@@ -53,7 +53,36 @@
       <p class="ayuda">Ajusta las cantidades de la compra.</p>
     </div>
 
+    <div class="campo">
+      <label for="tiempo_max">¿Cuánto tiempo tienes para cocinar?</label>
+      {# value="" es "sin límite". Las franjas son las mismas que ya usa el
+         filtro de la pantalla siguiente, para no tener dos escalas distintas. #}
+      <select id="tiempo_max" name="tiempo_max">
+        <option value="">Sin preferencia</option>
+        <option value="25">Rápidas, menos de 25 min</option>
+        <option value="40">Hasta 40 minutos</option>
+        <option value="60">Hasta 1 hora</option>
+      </select>
+      <p class="ayuda">Solo se te propondrán recetas que no pasen de ahí.</p>
+    </div>
+
   </div>
+
+  <fieldset class="campo campo-preferencias">
+    <legend>¿Qué te gusta más? (opcional)</legend>
+    <div class="preferencias">
+      {% for grupo in grupos_preferibles %}
+        <label class="preferencia">
+          <input type="checkbox" name="preferencias" value="{{ grupo }}">
+          <span class="preferencia-cuerpo">{{ nombres_grupos[grupo] }}</span>
+        </label>
+      {% endfor %}
+    </div>
+    <p class="ayuda">
+      Las recetas que llevan lo que marques aparecerán como "Recomendada" y el
+      algoritmo las tendrá algo más en cuenta, pero nunca dejará fuera nada por esto.
+    </p>
+  </fieldset>
 
   <fieldset class="campo campo-dietas">
     <legend>Tipo de dieta</legend>

@@ -5,23 +5,35 @@ Antes se resolvia montando un collage con las fotos de los productos de
 Mercadona (ver collage.py, que sigue ahi como red de seguridad), pero un
 mosaico de envases no da hambre.
 
-Se usan DOS fuentes, y en este orden:
+Se usan CUATRO fuentes, y en este orden:
 
-  1. OPENVERSE (api.openverse.org). Es un buscador de imagenes con licencia
-     libre que agrega Flickr, museos y otros. Cubre MUY bien la cocina
-     espanola: buscando "merluza al horno" salen fotos de merluza al horno.
+  1. THEMEALDB (themealdb.com). Una base de datos de recetas con foto, no un
+     banco de imagenes generico: cuando encuentra algo, es SIEMPRE la foto de
+     ESE plato ya cocinado, nunca un articulo generico ni una casualidad de
+     texto. Clave publica "1" (de desarrollo/educativa, sin registro). Su
+     cobertura de cocina espanola es real pero modesta: comprobado a mano,
+     "Pollo en pepitoria", "Gambas al ajillo" o "Gazpacho" encuentran su plato
+     exacto, pero la mayoria de nombres de este recetario no estan en su base
+     (no tienen "Lentejas estofadas con chorizo" ni "Bacalao a la vizcaina").
+     Por eso nunca es la unica fuente: es la primera bala, y casi siempre hay
+     que seguir con las demas.
+
+  2. WIKIPEDIA (es.wikipedia.org). La foto principal del articulo que mejor
+     encaja. Acierta mucho porque la eligio una persona para ilustrar ESE
+     plato, pero solo funciona bien con consultas de dos palabras o mas.
+
+  3. OPENVERSE (api.openverse.org). Un buscador de imagenes con licencia
+     libre que agrega Flickr, museos y otros. Cubre bien la cocina espanola.
      No hace falta clave ni registro.
 
-  2. WIKIMEDIA COMMONS. Licencias mas libres, pero cobertura floja para
-     platos: buscando "Lentejas guisadas" la primera respuesta fue un libro
-     de fabulas de Esopo de 1500 y pico. Se usa para rellenar cuando
-     Openverse se queda corto.
+  4. WIKIMEDIA COMMONS. Licencias mas libres, pero cobertura floja para
+     platos sueltos. Se usa para rellenar cuando las demas se quedan cortas.
 
 SOBRE LAS LICENCIAS
 -------------------
-Muchas fotos son CC BY-NC (no comercial) o BY-ND (sin obras derivadas). Este
-proyecto es personal y no se distribuye, asi que ambas valen. Pero hay que
-cumplir dos cosas:
+Wikipedia, Openverse y Commons dan fotos con licencia libre de verdad (a
+veces CC BY-NC o BY-ND; este proyecto es personal y no se distribuye, asi
+que ambas valen). Con esas tres se cumplen dos cosas:
 
   - ATRIBUIR: guardamos autor, licencia y enlace al original, y se ensenan en
     la ficha de la receta. Openverse ya nos da el texto de atribucion montado.
@@ -29,6 +41,17 @@ cumplir dos cosas:
   - NO MODIFICAR la foto: nada de recortarla ni de escribirle el nombre encima
     como hace el collage. ND no lo permite. Se guarda tal cual y el tamano lo
     decide el CSS.
+
+TheMealDB es distinto y hay que ser honestos con ello: sus fotos vienen de
+blogs de recetas externos (BBC Good Food y similares) y NO llevan una
+licencia libre confirmada — su propia documentacion lo dice: la clave "1" es
+"para desarrollo y uso educativo", y avisa de que hay que revisar la licencia
+de cada imagen antes de redistribuirla. Aqui no se redistribuye nada (la foto
+solo se guarda en tu disco para que la veas tu), pero por eso en la ficha de
+la receta su atribucion NO dice "CC" como las demas: dice honestamente que la
+licencia no esta confirmada, con un enlace a la pagina del plato en TheMealDB.
+Si algun dia esto se convirtiera en algo publico, las fotos de TheMealDB
+serian las primeras que revisar.
 """
 
 import time
@@ -42,14 +65,28 @@ from app.utiles import normalizar_texto
 OPENVERSE = "https://api.openverse.org/v1/images/"
 COMMONS = "https://commons.wikimedia.org/w/api.php"
 WIKIPEDIA = "https://es.wikipedia.org/w/api.php"
+THEMEALDB = "https://www.themealdb.com/api/json/v1/1/search.php"
 
-# Cuanto se le suma a la relevancia de una foto que venga de Wikipedia.
+# Cuanto se le suma a la relevancia de una foto que venga de Wikipedia o de
+# TheMealDB frente a una de un banco de imagenes generico.
 #
-# No es un capricho: la foto principal de un articulo de Wikipedia sobre un
-# plato la ha elegido una persona para ilustrar ESE plato. Una foto de un
-# banco de imagenes solo tiene un titulo que casualmente comparte una palabra.
-# La primera merece mas confianza de partida, y este numero lo dice.
+# No es un capricho: la foto principal de un articulo de Wikipedia, o la foto
+# de una receta de TheMealDB, la ha elegido una persona para ilustrar ESE
+# plato. Una foto de un banco de imagenes generico solo tiene un titulo que
+# casualmente comparte una palabra. Las dos merecen mas confianza de partida
+# que Openverse o Commons, y este numero lo dice; van igualadas entre si
+# porque las dos son "alguien eligio esta foto para este plato exacto", pese
+# a que la licencia de TheMealDB sea menos clara (ver el docstring de arriba).
 BONUS_WIKIPEDIA = 2
+BONUS_THEMEALDB = 2
+
+# Cuanto suma que el titulo de la foto mencione el ingrediente que mas pesa
+# en la receta (ver el parametro ingrediente_principal en buscar_candidatas).
+# Nacio de un fallo real: "Pollo al horno con patatas" acabo con una foto de
+# patatas fritas SIN POLLO, porque su titulo coincidia en "patatas" y eso ya
+# le daba puntuacion positiva. Este extra hace que, a igualdad de lo demas,
+# gane la foto que si muestra el ingrediente que define el plato.
+EXTRA_INGREDIENTE_PRINCIPAL = 3
 
 CABECERAS = {
     "User-Agent": "mercadona-dieta-app/2.0 (proyecto personal)",
@@ -94,7 +131,9 @@ GENERICAS = {
 }
 
 
-def buscar_candidatas(nombre_receta: str, cuantas: int = 6) -> list[dict]:
+def buscar_candidatas(
+    nombre_receta: str, cuantas: int = 6, ingrediente_principal: str | None = None
+) -> list[dict]:
     """Devuelve varias fotos candidatas para una receta, la mejor primero.
 
     Se prueban varias formas de escribir la busqueda porque el nombre completo
@@ -104,6 +143,14 @@ def buscar_candidatas(nombre_receta: str, cuantas: int = 6) -> list[dict]:
 
     Al final se ordenan por lo bien que el TITULO de la foto encaja con el
     nombre de la receta, que resulta ser una senal bastante fiable.
+
+    `ingrediente_principal` (opcional) es el nombre del ingrediente que mas
+    pesa en la receta, p.ej. "Pechuga de pollo". Si se pasa, una foto cuyo
+    titulo tambien lo mencione recibe un empujon extra en la relevancia. Sirve
+    para corregir un fallo real: "Pollo al horno con patatas" tenia una foto
+    de una sarten de patatas SIN NI RASTRO DE POLLO, porque su titulo
+    coincidia en "patatas" (una palabra concreta del nombre) y eso ya bastaba
+    para pasar el filtro. Ver _relevancia().
     """
     candidatas: list[dict] = []
     vistas: set[str] = set()
@@ -118,6 +165,7 @@ def buscar_candidatas(nombre_receta: str, cuantas: int = 6) -> list[dict]:
     consultas_wikipedia = [c for c in consultas if len(_palabras_utiles(c)) >= 2]
 
     for buscar_en, lista in (
+        (_themealdb, consultas),
         (_wikipedia, consultas_wikipedia),
         (_openverse, consultas),
         (_commons, consultas),
@@ -127,9 +175,13 @@ def buscar_candidatas(nombre_receta: str, cuantas: int = 6) -> list[dict]:
                 if resultado["url"] in vistas:
                     continue
                 vistas.add(resultado["url"])
-                resultado["relevancia"] = _relevancia(resultado["titulo"], nombre_receta)
+                resultado["relevancia"] = _relevancia(
+                    resultado["titulo"], nombre_receta, ingrediente_principal
+                )
                 if resultado["origen"] == "Wikipedia" and resultado["relevancia"] > 0:
                     resultado["relevancia"] += BONUS_WIKIPEDIA
+                elif resultado["origen"] == "TheMealDB" and resultado["relevancia"] > 0:
+                    resultado["relevancia"] += BONUS_THEMEALDB
                 candidatas.append(resultado)
             # Con unas cuantas que encajen bien ya vale: no hace falta
             # machacar las dos APIs con todas las variantes.
@@ -169,26 +221,65 @@ def _palabras_utiles(nombre: str) -> list[str]:
     return [p for p in normalizar_texto(nombre).split() if p not in VACIAS]
 
 
-def _relevancia(titulo: str, nombre_receta: str) -> int:
+# A partir de que longitud una palabra se compara por PREFIJO en vez de exigir
+# que sea exactamente igual. Mismo umbral, mismo motivo y mismo numero que
+# app/planificador/emparejador.py, que aprendio esta leccion primero.
+#
+# Se descubrio aqui un fallo gemelo al de alli, y de la peor manera: mirando
+# las fotos elegidas, la receta "Espaguetis con tomate y ajo" tenia puesta
+# una foto de "Alfajores" (un dulce). La razon: la version de _relevancia()
+# de antes comparaba "¿esta 'ajo' en alguna parte del titulo?" como texto
+# corrido, sin mirar donde empiezan y acaban las palabras, y "ajo" SI esta
+# ahi dentro de "alfaJOres" (a-l-f-a-J-O-r-e-s), pura casualidad de letras.
+# Con TheMealDB, cuya base son sobre todo titulos en ingles, este tipo de
+# coincidencia accidental se volvio mucho mas frecuente que con las otras
+# fuentes.
+LONGITUD_PALABRA_CORTA = 4
+
+
+def _coincide(palabra: str, palabra_titulo: str) -> bool:
+    """¿Cuenta esta palabra del titulo como una coincidencia de esta palabra?
+
+    Palabras cortas (4 letras o menos) tienen que ser EXACTAMENTE la misma:
+    sin esto, "ajo" encaja dentro de "alfaJOres" o "sal" dentro de "salteado".
+    Palabras largas valen por prefijo, para pillar plurales y derivados:
+    "champinon" encuentra "champiñones".
+    """
+    if len(palabra) <= LONGITUD_PALABRA_CORTA:
+        return palabra_titulo == palabra
+    return palabra_titulo.startswith(palabra) or palabra.startswith(palabra_titulo)
+
+
+def _relevancia(titulo: str, nombre_receta: str, ingrediente_principal: str | None = None) -> int:
     """Cuanto encaja el titulo de una foto con el nombre de una receta.
 
-    Cuenta cuantas palabras comparten, PERO las genericas ("crema",
-    "ensalada") valen la mitad que las concretas ("calabacin", "lentejas"), y
-    si no coincide ninguna concreta la puntuacion es cero.
+    Cuenta cuantas PALABRAS COMPLETAS comparten (no trozos de palabra), PERO
+    las genericas ("crema", "ensalada") valen la mitad que las concretas
+    ("calabacin", "lentejas"), y si no coincide ninguna concreta la
+    puntuacion es cero.
 
     Esa ultima regla es la que mata al bizcocho: se titulaba "Coc de crema de
     xocolata", comparte "crema" con "Crema de calabacin y queso", pero no
     comparte ni "calabacin" ni "queso". Cero.
+
+    Si se conoce el ingrediente que mas pesa en la receta, mencionarlo suma
+    un extra (EXTRA_INGREDIENTE_PRINCIPAL). No es un requisito, solo un
+    empujon: exigirlo a rajatabla dejaria sin foto recetas cuya mejor
+    candidata legitima no llegue a nombrar el ingrediente por su nombre
+    exacto. Pero el empujon es justo lo que hacia falta para que, entre varias
+    fotos con la misma puntuacion por palabras generales, gane la que de
+    verdad muestra el ingrediente principal y no una guarnicion cualquiera.
     """
-    titulo_normalizado = normalizar_texto(titulo)
+    palabras_titulo = normalizar_texto(titulo).split()
     palabras = _palabras_utiles(nombre_receta)
 
     concretas = 0
     genericas = 0
     for palabra in palabras:
-        # Se compara por prefijo para que "lenteja" encuentre "lentejas".
+        # Se quita la "s" final para que "lenteja" encuentre "lentejas" sin
+        # necesitar tambien el plural exacto.
         raiz = palabra[:-1] if len(palabra) > 5 and palabra.endswith("s") else palabra
-        if raiz in titulo_normalizado:
+        if any(_coincide(raiz, pt) for pt in palabras_titulo):
             if _es_generica(palabra):
                 genericas += 1
             else:
@@ -196,7 +287,15 @@ def _relevancia(titulo: str, nombre_receta: str) -> int:
 
     if concretas == 0:
         return 0
-    return concretas * 2 + genericas
+
+    puntuacion = concretas * 2 + genericas
+
+    if ingrediente_principal:
+        palabras_ingrediente = _palabras_utiles(ingrediente_principal)
+        if any(_coincide(p, pt) for p in palabras_ingrediente for pt in palabras_titulo):
+            puntuacion += EXTRA_INGREDIENTE_PRINCIPAL
+
+    return puntuacion
 
 
 def _variantes(nombre: str) -> list[str]:
@@ -245,6 +344,57 @@ def _variantes(nombre: str) -> list[str]:
         v for v in dict.fromkeys(variantes)
         if v and any(not _es_generica(p) for p in _palabras_utiles(v))
     ]
+
+
+def _themealdb(consulta: str, cuantas: int) -> list[dict]:
+    """Busca en TheMealDB, una base de datos de recetas con foto.
+
+    A diferencia de las otras tres fuentes, aqui no se busca "una foto que
+    tenga estas palabras en el titulo": se busca una RECETA que se llame asi,
+    y la foto que devuelve es la de esa receta exacta. Por eso, cuando
+    encuentra algo, suele ser un acierto muy limpio.
+
+    El "search.php?s=" de su API hace una coincidencia de texto contra el
+    nombre del plato (en ingles casi siempre, aunque muchos platos espanoles
+    conservan su nombre: "Paella", "Gazpacho", "Pollo en pepitoria"). Por eso
+    NO conviene ser la unica fuente: para un nombre como "Lentejas estofadas
+    con chorizo" no va a encontrar nada, y ahi entran las demas.
+    """
+    parametros = {"s": consulta}
+    try:
+        respuesta = requests.get(
+            THEMEALDB, params=parametros, headers=CABECERAS, timeout=config.TIMEOUT_SEGUNDOS
+        )
+        respuesta.raise_for_status()
+        datos = respuesta.json()
+    except (requests.RequestException, ValueError):
+        return []
+    finally:
+        time.sleep(PAUSA)
+
+    resultados = []
+    for plato in (datos.get("meals") or [])[:cuantas]:
+        miniatura = plato.get("strMealThumb")
+        if not miniatura:
+            continue
+        nombre = plato.get("strMeal") or consulta
+        resultados.append(
+            {
+                "url": miniatura,
+                "titulo": nombre,
+                "autor": "TheMealDB",
+                # Deliberadamente NO dice "CC": ver la nota de licencias en la
+                # cabecera del archivo. Es la unica fuente de las cuatro cuya
+                # licencia no esta confirmada.
+                "licencia": "sin licencia libre confirmada",
+                "licencia_url": "https://www.themealdb.com/terms_of_use.php",
+                "enlace": f"https://www.themealdb.com/meal/{plato.get('idMeal', '')}",
+                "atribucion": f"Foto de la receta '{nombre}' via TheMealDB (themealdb.com)",
+                "origen": "TheMealDB",
+                "consulta": consulta,
+            }
+        )
+    return resultados
 
 
 def _wikipedia(consulta: str, cuantas: int) -> list[dict]:

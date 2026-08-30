@@ -18,7 +18,7 @@
     Te he dejado marcada una propuesta para
     {{ peticion.presupuesto | euros }} · {{ peticion.semanas }} semana{{ 's' if peticion.semanas > 1 }} ·
     {{ peticion.personas }} persona{{ 's' if peticion.personas > 1 }} ·
-    {{ nombres_dietas[peticion.dieta] }}.
+    {{ nombres_dietas[peticion.dieta] }}{% if peticion.tiempo_max %} · hasta {{ peticion.tiempo_max }} min{% endif %}.
     Quita lo que no te apetezca y añade lo que sí.
   </p>
 </section>
@@ -36,6 +36,13 @@
   <input type="hidden" name="dieta" value="{{ peticion.dieta }}">
   {% if peticion.con_desayunos %}<input type="hidden" name="desayunos" value="on">{% endif %}
   {% if peticion.despensa_en_casa %}<input type="hidden" name="despensa" value="on">{% endif %}
+  {% if peticion.tiempo_max %}<input type="hidden" name="tiempo_max" value="{{ peticion.tiempo_max }}">{% endif %}
+  {# Una entrada oculta por cada preferencia marcada: name repetido, igual que
+     los checkboxes de origen, asi que form.getlist("preferencias") los lee
+     todos igual vengan del formulario inicial o de aqui. #}
+  {% for grupo in peticion.preferencias %}
+    <input type="hidden" name="preferencias" value="{{ grupo }}">
+  {% endfor %}
   {# Este marca la diferencia entre "dame una propuesta" y "recalcula lo mio" #}
   <input type="hidden" name="recalcular" value="1">
 
@@ -115,6 +122,7 @@
           <h3>{{ receta.nombre }}</h3>
           <p class="tarjeta-elegir-datos">
             <span class="pastilla pastilla-{{ receta.dificultad }}">{{ receta.nombre_dificultad }}</span>
+            {% if receta.id in recomendadas %}<span class="insignia">Recomendada</span>{% endif %}
             {{ receta.minutos }} min · {{ receta.raciones }} raciones
           </p>
           <p class="tarjeta-elegir-cifras">

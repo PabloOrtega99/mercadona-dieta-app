@@ -143,11 +143,14 @@ main { padding: 2rem 0 3rem; }
 /* --- Formulario --- */
 .formulario { margin-bottom: 2.5rem; }
 
-/* Grid: tres columnas iguales. minmax(0,1fr) en vez de 1fr a secas evita que
-   un contenido ancho desborde la columna. */
+/* auto-fit + minmax en vez de un numero fijo de columnas: con presupuesto,
+   semanas y personas caben tres en fila, y al anadir el tiempo de preparacion
+   se reparten solas en cuatro sin dejar un hueco raro ni tocar esta regla otra
+   vez si algun dia se anade un campo mas. minmax(0,1fr) evita que un
+   contenido ancho desborde la columna. */
 .campos {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1.25rem;
   margin-bottom: 1.5rem;
 }
@@ -231,6 +234,43 @@ main { padding: 2rem 0 3rem; }
 }
 .casilla input { margin-top: .25rem; width: 17px; height: 17px; accent-color: var(--verde); }
 .casilla small { display: block; color: var(--tinta-suave); font-size: .82rem; }
+
+/* --- Preferencias de comida: chips en vez de tarjetas grandes ---
+   Con 9 grupos de alimento, las tarjetas de .dieta (una por fila en movil,
+   varias grandes en escritorio) ocupan demasiado sitio. Aqui van como
+   pastillas pequeñas en una fila que se ajusta sola (flex-wrap), con el mismo
+   truco de checkbox escondido + hermano que cambia con :checked que ya usan
+   las tarjetas de dieta. */
+.campo-preferencias { border: 0; padding: 0; margin: 0 0 1.5rem; }
+.preferencias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem;
+}
+.preferencia { cursor: pointer; }
+.preferencia input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.preferencia-cuerpo {
+  display: inline-block;
+  padding: .5rem 1rem;
+  border: 2px solid var(--linea);
+  border-radius: 999px;
+  font-size: .87rem;
+  font-weight: 600;
+  color: var(--tinta-suave);
+  transition: border-color .12s, background .12s, color .12s;
+}
+.preferencia:hover .preferencia-cuerpo { border-color: var(--tinta-tenue); }
+.preferencia input:checked + .preferencia-cuerpo {
+  border-color: var(--verde);
+  background: var(--verde-claro);
+  color: var(--verde-oscuro);
+}
+.preferencia input:focus-visible + .preferencia-cuerpo { outline: 2px solid var(--verde); outline-offset: 2px; }
 
 .boton-principal {
   width: 100%;
